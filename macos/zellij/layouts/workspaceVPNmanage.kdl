@@ -1,0 +1,40 @@
+layout {
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        children
+        pane size=2 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="VPNserverManage" focus=true {
+        pane split_direction="vertical" {
+            pane split_direction="horizontal" size="40%" {
+                pane {
+                    cwd "/Users/olgazaharova/.config"
+                }
+                pane size="40%" {
+                    command "htop"
+                }
+            }
+            pane split_direction="horizontal" size="60%" {
+                pane size="70%" {
+                    cwd "/Users/olgazaharova/Project/ProjectPython/VPNserverManage-Clean"
+                    command "zsh"
+                    args "-i" "-c" "n ."
+                }
+                pane size="30%" {
+                    cwd "/Users/olgazaharova/Project/ProjectPython/VPNserverManage-Clean"
+                }
+            }
+        }
+    }
+
+    tab name="Config" {
+        pane {
+            cwd "/Users/olgazaharova/.config"
+        }
+    }
+}
