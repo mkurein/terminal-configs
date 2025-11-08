@@ -50,3 +50,6 @@ $RECYCLE.BIN/
 tmp/
 temp/
 
+# Imported guides (not part of this repo)
+Guides/
+
