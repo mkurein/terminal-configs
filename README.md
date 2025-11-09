@@ -142,9 +142,12 @@ terminal-configs/
     │   └── aliases.zsh                    # Алиасы (n=nvim)
     ├── wa.bat                             # Запуск Alacritty из текущей папки Windows
     ├── alacritty-here.reg                 # Добавление в контекстное меню
+    ├── INSTALL_WA.md                      # Установка wa.bat в System32
     └── docs/
         ├── COMPLETE_SETUP_GUIDE.md        # Полное руководство (1281 строка)
-        └── LAZYVIM_SETUP.md               # Руководство по LazyVim
+        ├── LAZYVIM_SETUP.md               # Руководство по LazyVim
+        ├── PRODUCTIVITY_TOOLS.md          # Инструменты продуктивности
+        └── WSL_FILE_OPERATIONS.md         # Работа с файлами WSL ↔ Windows
 ```
 
 ---

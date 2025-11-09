@@ -116,6 +116,15 @@ Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
   - Clean System - очистка и обслуживание WSL
   - Полезные алиасы и функции
 
+- **[📁 WSL File Operations](./docs/WSL_FILE_OPERATIONS.md)** ✨ NEW!  
+  Работа с файлами между WSL и Windows:
+  - Копирование файлов (4 способа)
+  - Буфер обмена (win32yank)
+  - Доступ к WSL из Windows (`\\wsl$\`)
+  - Доступ к Windows из WSL (`/mnt/c/`)
+  - Best practices и оптимизация производительности
+  - Troubleshooting
+
 ---
 
 ## 🚀 Быстрый запуск из проводника Windows
@@ -123,6 +132,8 @@ Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
 ### Открытие Alacritty в текущей папке
 
 Файл `wa.bat` позволяет открыть Alacritty прямо из проводника Windows в текущей папке.
+
+📖 **Подробная инструкция по установке:** [INSTALL_WA.md](./INSTALL_WA.md)
 
 **Что делает скрипт:**
 1. Получает текущий путь Windows
@@ -158,11 +169,23 @@ Windows Registry Editor Version 5.00
 3. Подтвердите добавление в реестр
 4. Теперь ПКМ в папке → "Open Alacritty Here" ✨
 
-#### Вариант 3: Добавить wa.bat в PATH
+#### Вариант 3: Добавить wa.bat в System32 (Рекомендуется)
 
-1. Скопируйте `wa.bat` в `C:\Windows\` (требуются права администратора)
-2. Или добавьте папку с `wa.bat` в PATH
-3. Теперь в любой папке: адресная строка → `wa` → Enter
+**Установка:**
+
+```powershell
+# Откройте PowerShell от администратора и выполните:
+Copy-Item windows\wa.bat C:\Windows\System32\
+```
+
+**Теперь команда `wa` работает в любой папке:**
+1. Откройте проводник
+2. Перейдите в любую папку
+3. Кликните в адресную строку
+4. Введите `wa` → Enter
+5. Alacritty откроется в этой папке в WSL! 🚀
+
+**Альтернатива:** Добавьте папку с `wa.bat` в PATH через System Environment Variables
 
 ---
 

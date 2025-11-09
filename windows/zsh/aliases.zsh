@@ -1,6 +1,10 @@
 alias n=nvim
 alias open=explorer.exe
-#alias pbcopy="win32yank.exe -i"
+
+# Буфер обмена (требуется win32yank)
+alias clip='win32yank.exe -i'
+alias paste='win32yank.exe -o'
+# alias pbcopy="win32yank.exe -i"  # для совместимости с macOS
 
 # ===== QUICK ALIASES =====
 alias c='clear'
@@ -80,5 +84,21 @@ psgrep() {
 # Открыть в VSCode
 code() {
   /mnt/c/Users/$(whoami)/AppData/Local/Programs/Microsoft\ VS\ Code/Code.exe "$@" 2>/dev/null &
+}
+
+# WSL <-> Windows file operations
+alias winopen='explorer.exe .'
+alias cdwin='cd /mnt/c/Users/$(whoami)/'
+pwdwin() {
+  wslpath -w "$(pwd)" | clip
+  echo "✓ Windows путь скопирован в буфер обмена"
+}
+
+# Преобразование путей
+winpath() {
+  wslpath -w "$1"
+}
+wslpath() {
+  command wslpath "$1"
 }
 
