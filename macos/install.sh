@@ -73,6 +73,19 @@ cp scripts/*.sh "$HOME/"
 chmod +x "$HOME"/*.sh
 log_success "Скрипты запуска установлены"
 
+# Open Alacritty Here скрипты
+if [[ -f "scripts/open-alacritty-here.sh" ]]; then
+    log_success "Open Alacritty Here установлен"
+fi
+if [[ -f "scripts/open-alacritty-here-simple.sh" ]]; then
+    log_success "Open Alacritty Here (Simple) установлен"
+fi
+
+# Productivity scripts
+if [[ -f "scripts/project-switcher.sh" ]]; then
+    log_success "Productivity tools установлены"
+fi
+
 # Zsh aliases (если существует)
 if [[ -f "zsh/aliases.zsh" ]]; then
     cp zsh/aliases.zsh "$HOME/.config/zsh/aliases.zsh"

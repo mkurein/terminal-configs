@@ -77,12 +77,13 @@ Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
 |----------|------------------|----------|
 | `zellij/config.kdl` | `~/.config/zellij/config.kdl` | Конфигурация Zellij |
 | `zellij/layouts/*.kdl` | `~/.config/zellij/layouts/` | Workspace layouts |
-| `scripts/*.sh` | `~/` | Скрипты запуска |
-| `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Алиасы (n=nvim) |
+| `scripts/*.sh` | `~/` | Скрипты запуска и инструменты продуктивности |
+| `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Алиасы и функции (30+ команд) |
 
 | Источник | Назначение (Windows) | Описание |
 |----------|----------------------|----------|
 | `alacritty/alacritty.toml` | `%APPDATA%\alacritty\alacritty.toml` | Конфигурация Alacritty |
+| `wa.bat` | `C:\Windows\` или в PATH | Запуск Alacritty из текущей папки |
 
 ---
 
@@ -105,6 +106,63 @@ Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
   - Установка LSP серверов через Mason
   - Добавление плагинов
   - Кастомизация и настройка
+
+- **[⚡ Productivity Tools](./docs/PRODUCTIVITY_TOOLS.md)** ✨ NEW!  
+  Инструменты для повышения продуктивности:
+  - Project Switcher - быстрое переключение между проектами
+  - Backup & Sync - резервное копирование и синхронизация конфигов
+  - Dev Environment - автоматическая настройка окружения
+  - Git Quick - быстрые Git команды (add+commit+push одной командой)
+  - Clean System - очистка и обслуживание WSL
+  - Полезные алиасы и функции
+
+---
+
+## 🚀 Быстрый запуск из проводника Windows
+
+### Открытие Alacritty в текущей папке
+
+Файл `wa.bat` позволяет открыть Alacritty прямо из проводника Windows в текущей папке.
+
+**Что делает скрипт:**
+1. Получает текущий путь Windows
+2. Конвертирует его в WSL путь
+3. Открывает Alacritty с переходом в эту папку в WSL
+
+### Способы использования:
+
+#### Вариант 1: Через адресную строку проводника
+1. Откройте нужную папку в проводнике Windows
+2. Кликните в адресную строку
+3. Введите `wa` и нажмите Enter
+4. Alacritty откроется в этой папке в WSL! 🎉
+
+#### Вариант 2: Добавить в контекстное меню
+
+**Создайте файл `alacritty-here.reg`:**
+
+```reg
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\AlacrittyHere]
+@="Open Alacritty Here"
+"Icon"="C:\\Program Files\\Alacritty\\alacritty.exe"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\AlacrittyHere\command]
+@="\"C:\\Project\\Project_Git\\terminal-configs\\windows\\wa.bat\""
+```
+
+**Установка:**
+1. Отредактируйте путь к `wa.bat` в файле `.reg`
+2. Двойной клик на `alacritty-here.reg`
+3. Подтвердите добавление в реестр
+4. Теперь ПКМ в папке → "Open Alacritty Here" ✨
+
+#### Вариант 3: Добавить wa.bat в PATH
+
+1. Скопируйте `wa.bat` в `C:\Windows\` (требуются права администратора)
+2. Или добавьте папку с `wa.bat` в PATH
+3. Теперь в любой папке: адресная строка → `wa` → Enter
 
 ---
 
@@ -160,6 +218,17 @@ Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
 - `Space + fg` - поиск по содержимому
 - `gd` - перейти к определению
 - `K` - показать документацию
+
+### Productivity Tools ✨ NEW!
+- `ps` - быстрое переключение между проектами
+- `gq acp "message"` - add + commit + push одной командой
+- `devenv` - автонастройка окружения проекта
+- `backup` - резервное копирование всех конфигов
+- `sync` - синхронизация с репозиторием
+- `clean` - очистка системы WSL
+- `mkcd folder` - создать папку и перейти в нее
+- `serve 3000` - запустить веб-сервер
+- [См. полный список](./docs/PRODUCTIVITY_TOOLS.md)
 
 ---
 

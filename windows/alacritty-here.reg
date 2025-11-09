@@ -1,0 +1,16 @@
+Windows Registry Editor Version 5.00
+
+; Добавление "Open Alacritty Here" в контекстное меню проводника
+; ВАЖНО: Измените путь к wa.bat перед импортом!
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\AlacrittyHere]
+@="Open Alacritty Here"
+"Icon"="C:\\Program Files\\Alacritty\\alacritty.exe"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\AlacrittyHere\command]
+@="\"C:\\Project\\Project_Git\\terminal-configs\\windows\\wa.bat\""
+
+; Чтобы удалить из контекстного меню, используйте:
+; Windows Registry Editor Version 5.00
+; [-HKEY_CLASSES_ROOT\Directory\Background\shell\AlacrittyHere]
+

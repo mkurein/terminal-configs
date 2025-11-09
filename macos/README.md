@@ -57,11 +57,82 @@ cd macos
 | `scripts/start-zellij-choose.sh` | `~/start-zellij-choose.sh` | Меню выбора layout |
 | `scripts/start-vpn-manage.sh` | `~/start-vpn-manage.sh` | Прямой запуск 40/60 |
 | `scripts/start-vpn-manage-5050.sh` | `~/start-vpn-manage-5050.sh` | Прямой запуск 50/50 |
+| `scripts/open-alacritty-here.sh` | `~/open-alacritty-here.sh` | Открыть Alacritty в папке |
+| `scripts/open-alacritty-here-simple.sh` | `~/open-alacritty-here-simple.sh` | Упрощенная версия |
 | `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Алиасы (n=nvim) |
+
+## 🚀 Открыть Alacritty в текущей папке
+
+### Способ 1: Через Quick Action (Рекомендуется)
+
+**Добавление в контекстное меню Finder:**
+
+1. Запустите скрипт установки:
+```bash
+~/install-finder-service.sh
+```
+
+2. Следуйте инструкциям для создания Quick Action в Automator
+
+3. Теперь в Finder: **ПКМ на папке → Services → "Open Alacritty Here"** ✨
+
+**Бонус:** Добавьте горячую клавишу (например, `⌘⌥T`) в System Settings → Keyboard → Keyboard Shortcuts → Services
+
+### Способ 2: Из командной строки
+
+```bash
+# В текущей папке
+~/open-alacritty-here.sh
+
+# В указанной папке
+~/open-alacritty-here.sh ~/Projects/MyProject
+
+# Упрощенная версия (просто открывает новое окно)
+~/open-alacritty-here-simple.sh
+```
+
+### Способ 3: Создать алиас
+
+Добавьте в `~/.zshrc`:
+
+```bash
+alias here='open -na Alacritty --args --working-directory "$(pwd)"'
+```
+
+Теперь команда `here` откроет Alacritty в текущей папке!
+
+---
 
 ## 📖 Документация
 
-Полная документация: [ZELLIJ_SETUP_MACOS.md](./docs/ZELLIJ_SETUP_MACOS.md)
+### Основные руководства:
+
+- **[Zellij Setup](./docs/ZELLIJ_SETUP_MACOS.md)**  
+  Полная настройка Zellij с layouts и автозапуском
+
+- **[Finder Integration](./docs/FINDER_INTEGRATION.md)**  
+  Интеграция Alacritty с Finder (Quick Actions)
+
+### ⚡ Productivity Tools
+
+Аналогично Windows, добавлены инструменты для продуктивности:
+
+**Скрипты:**
+- `ps` - Project Switcher (быстрое переключение между проектами)
+- `gq` - Git Quick (add+commit+push одной командой)
+- `backup` - резервное копирование всех конфигов
+- `sync` - синхронизация с репозиторием
+- `devenv` - автонастройка окружения проекта
+- `clean` - очистка системы (Homebrew, npm, Docker, кеши)
+
+**Расширенные алиасы:**
+- Git: `gs`, `ga`, `gc`, `gp`, `gl`, `gd`
+- Навигация: `c`, `..`, `...`, `....`
+- Python: `py`, `pip`, `venv`, `activate`
+- macOS: `showfiles`, `hidefiles`, `flushdns`
+- И 10+ полезных функций
+
+См. `zsh/aliases.zsh` для полного списка
 
 ### Основные горячие клавиши
 

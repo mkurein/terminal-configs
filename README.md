@@ -20,6 +20,8 @@
 - Готовые workspace layouts (40/60 и 50/50)
 - Интерактивное меню выбора layout
 - Автоматический запуск Neovim в проектах
+- ✨ **NEW**: Productivity Tools - 6 скриптов + 35+ алиасов/функций
+- ✨ **NEW**: Finder Integration - Quick Action для открытия Alacritty
 
 ---
 
@@ -37,6 +39,7 @@
 - Готовые workspace layouts (40/60 и 50/50)
 - Автоматическое меню выбора layout
 - Скрипт установки для WSL
+- ✨ **NEW**: Productivity Tools - 6 скриптов + 30+ алиасов для ускорения работы
 
 ---
 
@@ -113,7 +116,10 @@ terminal-configs/
 │   │   ├── alacritty-start.sh             # Wrapper для автозапуска
 │   │   ├── start-zellij-choose.sh         # Меню выбора layout
 │   │   ├── start-vpn-manage.sh            # Прямой запуск 40/60
-│   │   └── start-vpn-manage-5050.sh       # Прямой запуск 50/50
+│   │   ├── start-vpn-manage-5050.sh       # Прямой запуск 50/50
+│   │   ├── open-alacritty-here.sh         # Открыть Alacritty в папке Finder
+│   │   ├── open-alacritty-here-simple.sh  # Упрощенная версия
+│   │   └── install-finder-service.sh      # Установка Quick Action
 │   ├── zsh/
 │   │   └── aliases.zsh                    # Алиасы (n=nvim)
 │   └── docs/
@@ -134,8 +140,11 @@ terminal-configs/
     │   └── start-simple.sh                # Прямой запуск 50/50
     ├── zsh/
     │   └── aliases.zsh                    # Алиасы (n=nvim)
+    ├── wa.bat                             # Запуск Alacritty из текущей папки Windows
+    ├── alacritty-here.reg                 # Добавление в контекстное меню
     └── docs/
-        └── COMPLETE_SETUP_GUIDE.md        # Полное руководство (1281 строка)
+        ├── COMPLETE_SETUP_GUIDE.md        # Полное руководство (1281 строка)
+        └── LAZYVIM_SETUP.md               # Руководство по LazyVim
 ```
 
 ---
