@@ -24,18 +24,19 @@
 ---
 
 ### 🪟 [Windows](./windows/)
-Полное руководство по настройке для Windows + WSL.
+Полная конфигурация для Windows 11 + WSL Debian.
 
 📖 **Документация**: [COMPLETE_SETUP_GUIDE.md](./windows/docs/COMPLETE_SETUP_GUIDE.md)
 
-**Версия**: 1.0 - Документация (обновлено 2025-11-08)
+**Версия**: 2.0 (обновлено 2025-11-09)
 
-**Включает**:
-- Установка и настройка WSL2
-- Alacritty: полная конфигурация для всех платформ
-- Neovim: от установки до продвинутых плагинов
-- LSP и автодополнение
-- 1000+ строк подробных инструкций
+**Особенности**:
+- Alacritty в Windows с интеграцией WSL
+- Zellij с Alt+стрелки навигацией
+- LazyVim с полной настройкой
+- Готовые workspace layouts (40/60 и 50/50)
+- Автоматическое меню выбора layout
+- Скрипт установки для WSL
 
 ---
 
@@ -59,9 +60,38 @@ cd macos
 
 ---
 
-### Windows
+### Windows + WSL
 
-*(Инструкции будут добавлены после настройки Windows конфигурации)*
+1. **Установите WSL и зависимости** (в WSL):
+```bash
+# Основные компоненты
+sudo apt update && sudo apt install zsh neovim htop build-essential -y
+
+# Zellij (через Cargo)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+cargo install zellij
+```
+
+2. **Клонируйте репозиторий** (в WSL):
+```bash
+git clone <your-repo-url> ~/terminal-configs
+cd ~/terminal-configs
+```
+
+3. **Запустите установку WSL конфигов**:
+```bash
+cd windows
+./install.sh
+```
+
+4. **Установите Alacritty в Windows** и скопируйте конфиг:
+```powershell
+# PowerShell
+scoop install alacritty
+Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
+```
+
+5. **Откройте Alacritty** и наслаждайтесь! 🎉
 
 ---
 
@@ -69,28 +99,43 @@ cd macos
 
 ```
 terminal-configs/
-├── README.md                          # Главный README
-├── macos/                             # Конфигурация для macOS
-│   ├── README.md                      # README для macOS
-│   ├── install.sh                     # Скрипт установки
+├── README.md                              # Главный README
+├── macos/                                 # Конфигурация для macOS
+│   ├── README.md                          # README для macOS
+│   ├── install.sh                         # Скрипт установки
 │   ├── alacritty/
-│   │   └── alacritty.toml             # Конфигурация Alacritty
+│   │   └── alacritty.toml                 # Конфигурация Alacritty
 │   ├── zellij/
 │   │   └── layouts/
 │   │       ├── workspaceVPNmanage.kdl     # Layout 40/60
 │   │       └── workspaceVPNmanage-5050.kdl # Layout 50/50
 │   ├── scripts/
-│   │   ├── alacritty-start.sh         # Wrapper для автозапуска
-│   │   ├── start-zellij-choose.sh     # Меню выбора layout
-│   │   ├── start-vpn-manage.sh        # Прямой запуск 40/60
-│   │   └── start-vpn-manage-5050.sh   # Прямой запуск 50/50
+│   │   ├── alacritty-start.sh             # Wrapper для автозапуска
+│   │   ├── start-zellij-choose.sh         # Меню выбора layout
+│   │   ├── start-vpn-manage.sh            # Прямой запуск 40/60
+│   │   └── start-vpn-manage-5050.sh       # Прямой запуск 50/50
 │   ├── zsh/
-│   │   └── aliases.zsh                # Алиасы (n=nvim)
+│   │   └── aliases.zsh                    # Алиасы (n=nvim)
 │   └── docs/
-│       └── ZELLIJ_SETUP_MACOS.md      # Полная документация
-└── windows/                           # Конфигурация для Windows
-    ├── README.md                      # README для Windows
-    └── docs/                          # Документация (будет добавлена)
+│       └── ZELLIJ_SETUP_MACOS.md          # Полная документация
+└── windows/                               # Конфигурация для Windows + WSL
+    ├── README.md                          # README для Windows
+    ├── install.sh                         # Скрипт установки (WSL)
+    ├── alacritty/
+    │   └── alacritty.toml                 # Конфигурация Alacritty (Windows)
+    ├── zellij/
+    │   ├── config.kdl                     # Конфигурация Zellij (WSL)
+    │   └── layouts/
+    │       ├── workspacePrjSnabjenie.kdl  # Layout 40/60
+    │       └── my-workspace.kdl           # Layout 50/50
+    ├── scripts/
+    │   ├── start-zellij-choose.sh         # Меню выбора layout
+    │   ├── start-prj-snabjenie.sh         # Прямой запуск 40/60
+    │   └── start-simple.sh                # Прямой запуск 50/50
+    ├── zsh/
+    │   └── aliases.zsh                    # Алиасы (n=nvim)
+    └── docs/
+        └── COMPLETE_SETUP_GUIDE.md        # Полное руководство (1281 строка)
 ```
 
 ---
@@ -106,15 +151,30 @@ terminal-configs/
 - Zsh + Oh My Zsh
 - htop
 
-### Windows
-*(Требования будут добавлены)*
+### Windows + WSL
+- Windows 11 (или Windows 10 с WSL2)
+- WSL2 с Debian/Ubuntu
+- Alacritty (для Windows)
+- Zellij (через Cargo в WSL)
+- Neovim 0.9+ (в WSL)
+- Zsh (в WSL)
+- Rust + Cargo (для Zellij)
+- htop (в WSL)
 
 ---
 
 ## 📝 Changelog
 
+### v2.0 - 2025-11-09 (Windows)
+- ✅ Сохранены все конфигурационные файлы с рабочей машины
+- ✅ Alacritty (Windows) + Zellij (WSL) + LazyVim интеграция
+- ✅ Готовые workspace layouts (40/60 и 50/50)
+- ✅ Скрипт установки для WSL (install.sh)
+- ✅ Alt+стрелки для навигации в Zellij
+- ✅ Полная документация и примеры
+
 ### v1.0 - 2025-11-08 (Windows)
-- 📚 Добавлено полное руководство по настройке (1000+ строк)
+- 📚 Добавлено полное руководство по настройке (1281 строка)
 - Объединены 3 источника: WSL, Alacritty, Neovim
 - Готова структура для конфигурационных файлов
 

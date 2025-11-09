@@ -1,84 +1,278 @@
-# 🪟 Windows Terminal Configuration
+# 🪟 Windows + WSL Terminal Configuration
 
-> **Статус**: Документация готова ✅ | Конфигурационные файлы в процессе 🚧
+> **Статус**: Готово ✅ | Конфигурационные файлы ✅ | Документация ✅
+
+Конфигурация терминала для **Windows 11 + WSL Debian** с **Alacritty + Zellij + LazyVim**.
+
+## 📦 Что включено
+
+- ✅ **Alacritty** (Windows) - быстрый GPU-ускоренный терминал с интеграцией WSL
+- ✅ **Zellij** (WSL) - terminal multiplexer с персистентностью
+- ✅ **LazyVim** (WSL) - готовая сборка Neovim с плагинами
+- ✅ **Workspace layouts** - готовые конфигурации (40/60 и 50/50)
+- ✅ **Автозапуск** - Zellij запускается автоматически из Alacritty
+- ✅ **Интерактивное меню** - выбор layout при запуске
+- ✅ **Alt+стрелки** - навигация между панелями Zellij
+
+## 🚀 Быстрая установка
+
+### 1. Установите зависимости в WSL
+
+```bash
+# Обновление системы
+sudo apt update && sudo apt upgrade -y
+
+# Основные компоненты
+sudo apt install zsh neovim htop build-essential -y
+
+# Rust (для Zellij)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source "$HOME/.cargo/env"
+
+# Zellij
+cargo install zellij
+
+# Oh My Zsh (опционально)
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+### 2. Запустите установку WSL конфигов
+
+```bash
+cd windows
+chmod +x install.sh
+./install.sh
+```
+
+### 3. Установите Alacritty в Windows
+
+**Вариант 1: Scoop**
+```powershell
+scoop install alacritty
+```
+
+**Вариант 2: Chocolatey**
+```powershell
+choco install alacritty
+```
+
+**Вариант 3:** [Скачайте с GitHub](https://github.com/alacritty/alacritty/releases)
+
+### 4. Скопируйте конфиг Alacritty в Windows
+
+```powershell
+# В PowerShell
+Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
+```
+
+### 5. Перезапустите Alacritty
+
+Откройте Alacritty → появится меню выбора workspace! 🎉
+
+---
+
+## 📁 Что будет установлено
+
+| Источник | Назначение (WSL) | Описание |
+|----------|------------------|----------|
+| `zellij/config.kdl` | `~/.config/zellij/config.kdl` | Конфигурация Zellij |
+| `zellij/layouts/*.kdl` | `~/.config/zellij/layouts/` | Workspace layouts |
+| `scripts/*.sh` | `~/` | Скрипты запуска |
+| `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Алиасы (n=nvim) |
+
+| Источник | Назначение (Windows) | Описание |
+|----------|----------------------|----------|
+| `alacritty/alacritty.toml` | `%APPDATA%\alacritty\alacritty.toml` | Конфигурация Alacritty |
+
+---
 
 ## 📖 Документация
 
-### [📚 Полное руководство по настройке](./docs/COMPLETE_SETUP_GUIDE.md)
+### Руководства:
 
-**Объединенное руководство включает:**
-- ✅ Установка и настройка WSL2
-- ✅ Alacritty: установка, конфигурация, темы, шрифты
-- ✅ Neovim: полная настройка с плагинами
-- ✅ LSP и автодополнение
-- ✅ Менеджеры плагинов (Lazy.nvim)
-- ✅ Готовые конфигурации и примеры
+- **[📚 Полное руководство по настройке](./docs/COMPLETE_SETUP_GUIDE.md)**  
+  Объединенное руководство (1281 строка):
+  - Установка и настройка WSL2
+  - Alacritty: установка, конфигурация, темы, шрифты
+  - Neovim: полная настройка с плагинами
+  - LSP и автодополнение
+  - Менеджеры плагинов (Lazy.nvim)
 
-**Размер руководства:** 1000+ строк подробных инструкций
+- **[🚀 LazyVim Setup](./docs/LAZYVIM_SETUP.md)**  
+  Краткое руководство по LazyVim:
+  - Установка LazyVim в WSL
+  - Основные горячие клавиши
+  - Установка LSP серверов через Mason
+  - Добавление плагинов
+  - Кастомизация и настройка
 
 ---
 
-## 🎯 Что включено в документацию
+## 🔧 Основные возможности
 
-### Windows + WSL
-- Установка WSL2 и выбор дистрибутива
-- Первичная настройка и инструменты
-- Интеграция с Windows
-- Настройка буфера обмена (win32yank)
+### Alacritty + WSL Integration
+- Запуск WSL Debian напрямую
+- GPU-ускорение для быстрой отрисовки
+- Прозрачность окна (opacity 0.95)
+- Шрифт Cascadia Code с лигатурами
+- Тема Gruvbox Dark
+
+### Zellij Configuration
+- Alt + стрелки для навигации между панелями
+- Кастомные горячие клавиши
+- Поддержка плавающих панелей
+- Режимы: pane, tab, resize, move, scroll
+
+### Workspace Layouts
+
+**1. workspacePrjSnabjenie.kdl** (40/60 split):
+- 40% слева: терминал + htop
+- 60% справа: Neovim (70%) + терминал (30%)
+- Автозапуск Neovim в проекте
+
+**2. my-workspace.kdl** (50/50 split):
+- 50% слева: терминал + htop
+- 50% справа: Neovim + терминал
+- Симметричная раскладка
+
+---
+
+## ⌨️ Горячие клавиши
+
+### Zellij
+- `Alt + стрелки` - переключение между панелями (быстро!)
+- `Ctrl + p` → `n` - новая панель
+- `Ctrl + t` → `n` - новый таб
+- `Ctrl + n` - режим изменения размера
+- `Ctrl + q` - выход из Zellij
+- `Alt + n` - новая панель (без переключения режима)
+- `Alt + f` - плавающие панели
 
 ### Alacritty
-- Установка на все платформы
-- Полная конфигурация (TOML)
-- Настройка шрифтов (Nerd Fonts)
-- Популярные цветовые схемы
-- Горячие клавиши и кастомизация
-- Интеграция с WSL
+- `Ctrl + Shift + V` - вставить
+- `Ctrl + Shift + C` - копировать
+- `Ctrl + Plus/Minus` - изменить размер шрифта
+- `F11` - полноэкранный режим
 
-### Neovim
-- Установка и базовая настройка
-- Структура конфигурации (Lua)
-- Плагины через Lazy.nvim
-- LSP настройка (Mason)
-- Автодополнение (nvim-cmp)
-- Neo-tree, Telescope, Treesitter
-- Готовая сборка LazyVim
+### LazyVim (Neovim)
+- `Space + e` - Neo-tree (файловый менеджер)
+- `Space + ff` - найти файл
+- `Space + fg` - поиск по содержимому
+- `gd` - перейти к определению
+- `K` - показать документацию
 
 ---
 
-## 📋 Планируется добавить
+## 🔧 Настройка под себя
 
-- [ ] Готовые конфигурационные файлы для Windows
-- [ ] Скрипты установки (PowerShell)
-- [ ] Интеграция с Windows Terminal
-- [ ] Zellij layouts для Windows/WSL
-- [ ] Примеры dotfiles
+### Изменить путь к проекту в layouts
+
+Отредактируйте файлы в `zellij/layouts/*.kdl`:
+
+```kdl
+cwd "/mnt/c/Project/ProjectSnabjenie"
+```
+
+Замените на путь к вашему проекту в WSL.
+
+### Добавить свой layout
+
+1. Скопируйте существующий layout:
+```bash
+cp ~/.config/zellij/layouts/workspacePrjSnabjenie.kdl ~/.config/zellij/layouts/my-custom.kdl
+```
+
+2. Отредактируйте под свои нужды
+
+3. Добавьте в `start-zellij-choose.sh`:
+```bash
+echo "3) my-custom - мой layout"
+# ...
+3)
+    exec zellij --layout "$HOME/.config/zellij/layouts/my-custom.kdl"
+    ;;
+```
+
+### Изменить тему Alacritty
+
+В `alacritty.toml` раскомментируйте нужную тему:
+
+```toml
+[general]
+import = [
+    # "~\\AppData\\Roaming\\alacritty\\themes\\themes\\tokyo-night.toml"
+    "~\\AppData\\Roaming\\alacritty\\themes\\themes\\gruvbox_dark.toml"
+    # "~\\AppData\\Roaming\\alacritty\\themes\\themes\\catppuccin_mocha.toml"
+]
+```
 
 ---
 
-## 🚀 Быстрый старт
+## 🐛 Устранение неполадок
 
-1. **Прочитайте документацию:**
-   ```bash
-   # Откройте руководство
-   docs/COMPLETE_SETUP_GUIDE.md
-   ```
+### Zellij не запускается
+```bash
+# Проверьте, что Zellij в PATH
+which zellij
+# Должно быть: /home/USERNAME/.cargo/bin/zellij
 
-2. **Следуйте инструкциям** для вашей платформы
-   - Windows: начните с раздела WSL
-   - macOS/Linux: переходите сразу к Alacritty
+# Добавьте в ~/.zshrc или ~/.bashrc:
+export PATH="$HOME/.cargo/bin:$PATH"
+```
 
-3. **Настройте по своему вкусу** используя примеры из руководства
+### Alt + стрелки не работают
+Проверьте, что в `alacritty.toml` есть bindings:
+```toml
+[[keyboard.bindings]]
+key = "Left"
+mods = "Alt"
+chars = "\u001b[1;3D"
+```
+
+### Neovim: LazyVim не установился
+```bash
+# Удалите старую конфигурацию
+rm -rf ~/.config/nvim ~/.local/share/nvim
+
+# Установите LazyVim
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+nvim  # При первом запуске установятся плагины
+```
+
+### WSL: медленный запуск
+Отключите антивирус для папки проекта в Windows или переместите проект в WSL:
+```bash
+# Вместо /mnt/c/Project используйте:
+~/Project
+```
 
 ---
 
-## 🔄 Обновления
+## 📝 Заметки
 
-### v1.0 - 2025-11-08
-- ✅ Полное руководство по настройке
-- ✅ Объединение трех источников
-- ✅ 1000+ строк документации
-- ✅ Примеры конфигураций для Alacritty и Neovim
-- ✅ LSP и плагины
+- **Alacritty** запускается в Windows нативно (GPU-ускорение)
+- **Zellij, Neovim, Zsh** работают в WSL (Linux окружение)
+- **Персистентность**: layouts и сессии сохраняются
+- **LazyVim**: готовая сборка с LSP, автодополнением, файловым менеджером
+- **Алиас `n`**: быстрый запуск Neovim (`n .` открывает текущую папку)
+
+---
+
+## 🔄 Обновление конфигурации
+
+Чтобы обновить из репозитория:
+
+```bash
+cd ~/terminal-configs
+git pull
+cd windows
+./install.sh
+```
+
+Для Alacritty (Windows):
+```powershell
+Copy-Item terminal-configs\windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
+```
 
 ---
 
@@ -86,15 +280,17 @@
 
 - [Neovim официальный сайт](https://neovim.io)
 - [Alacritty GitHub](https://github.com/alacritty/alacritty)
+- [Zellij Documentation](https://zellij.dev)
 - [LazyVim](https://www.lazyvim.org)
 - [Nerd Fonts](https://www.nerdfonts.com)
-- [Awesome Neovim](https://github.com/rockerBOO/awesome-neovim)
+- [WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
 
 ---
 
-**Текущая версия**: 1.0 (документация)
-**Дата**: 2025-11-08
-**Платформа**: Windows + WSL, macOS, Linux
+**Версия**: 2.0 (полная конфигурация)
+**Дата**: 2025-11-09
+**Платформа**: Windows 11 + WSL Debian
+**Компоненты**: Alacritty, Zellij, LazyVim, Zsh
 
-**См. также:** [macOS конфигурация](../macos/) - готовые файлы и скрипты установки
+**См. также:** [macOS конфигурация](../macos/) - аналогичная структура для macOS
 
