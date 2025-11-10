@@ -13,7 +13,19 @@
 - **Visibility**: Public или Private (на ваш выбор)
 - ⚠️ **НЕ создавайте** README, .gitignore, license (они уже есть в локальном репозитории)
 
-#### 2. Подключите удалённый репозиторий
+#### 2. Настройте сохранение credentials (один раз)
+
+```bash
+# Windows:
+git config --global credential.helper manager
+
+# macOS:
+git config --global credential.helper osxkeychain
+```
+
+💡 Это нужно сделать **один раз**. После этого Git больше не будет запрашивать логин/токен при каждом push.
+
+#### 3. Подключите удалённый репозиторий
 
 После создания GitHub покажет URL. Выполните в терминале:
 
@@ -30,7 +42,7 @@ git branch -M main
 git push -u origin main
 ```
 
-#### 3. Готово! 🎉
+#### 4. Готово! 🎉
 
 Ваш репозиторий теперь на GitHub!
 
@@ -56,6 +68,11 @@ gh repo create terminal-configs --private --source=. --remote=origin --push
 
 ```bash
 cd /Users/olgazaharova/terminal-configs
+
+# Настройте сохранение credentials (один раз)
+git config --global credential.helper manager  # Windows
+# или
+git config --global credential.helper osxkeychain  # macOS
 
 # Добавьте remote
 git remote add origin https://github.com/yourusername/terminal-configs.git
