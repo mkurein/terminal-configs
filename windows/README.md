@@ -125,6 +125,15 @@ Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
   - Best practices и оптимизация производительности
   - Troubleshooting
 
+- **[🚀 Useful Aliases & Commands](./docs/USEFUL_ALIASES.md)** ✨ NEW!  
+  Полный справочник по всем командам и алиасам:
+  - 32+ алиасов для повседневной работы
+  - Git quick commands (gq acp - add+commit+push!)
+  - Productivity shortcuts (ps, backup, sync, clean)
+  - Windows интеграция (open, clip, paste)
+  - Zellij и LazyVim горячие клавиши
+  - Готовые workflows для типичных задач
+
 ---
 
 ## 🚀 Быстрый запуск из проводника Windows

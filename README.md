@@ -26,20 +26,23 @@
 ---
 
 ### 🪟 [Windows](./windows/)
-Полная конфигурация для Windows 11 + WSL Debian.
+Полная конфигурация для Windows 11 + WSL Ubuntu.
 
-📖 **Документация**: [COMPLETE_SETUP_GUIDE.md](./windows/docs/COMPLETE_SETUP_GUIDE.md)
+📖 **Документация**: 
+- [COMPLETE_SETUP_GUIDE.md](./windows/docs/COMPLETE_SETUP_GUIDE.md) - полное руководство
+- [USEFUL_ALIASES.md](./windows/docs/USEFUL_ALIASES.md) - справочник команд ✨ NEW!
 
-**Версия**: 2.0 (обновлено 2025-11-09)
+**Версия**: 2.0 (обновлено 2025-11-10)
 
 **Особенности**:
-- Alacritty в Windows с интеграцией WSL
+- Alacritty в Windows с интеграцией WSL Ubuntu
 - Zellij с Alt+стрелки навигацией
 - LazyVim с полной настройкой
 - Готовые workspace layouts (40/60 и 50/50)
 - Автоматическое меню выбора layout
 - Скрипт установки для WSL
-- ✨ **NEW**: Productivity Tools - 6 скриптов + 30+ алиасов для ускорения работы
+- ✨ **NEW**: Productivity Tools - 6 скриптов + 32+ алиасов
+- ✨ **NEW**: Полный справочник команд и workflows
 
 ---
 
@@ -147,7 +150,8 @@ terminal-configs/
         ├── COMPLETE_SETUP_GUIDE.md        # Полное руководство (1281 строка)
         ├── LAZYVIM_SETUP.md               # Руководство по LazyVim
         ├── PRODUCTIVITY_TOOLS.md          # Инструменты продуктивности
-        └── WSL_FILE_OPERATIONS.md         # Работа с файлами WSL ↔ Windows
+        ├── WSL_FILE_OPERATIONS.md         # Работа с файлами WSL ↔ Windows
+        └── USEFUL_ALIASES.md              # Справочник команд и алиасов (32+)
 ```
 
 ---
@@ -176,6 +180,13 @@ terminal-configs/
 ---
 
 ## 📝 Changelog
+
+### v2.1 - 2025-11-10 (Windows)
+- ✅ Добавлен полный справочник команд и алиасов (USEFUL_ALIASES.md)
+- ✅ Обновлена конфигурация для Ubuntu WSL (было Debian)
+- ✅ Документированы все 32+ алиасов и функций
+- ✅ Добавлены готовые workflows для типичных задач
+- ✅ Полная интеграция Zellij + LazyVim + Productivity Tools
 
 ### v2.0 - 2025-11-09 (Windows)
 - ✅ Сохранены все конфигурационные файлы с рабочей машины
