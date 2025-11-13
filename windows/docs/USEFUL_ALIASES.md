@@ -776,9 +776,27 @@ source ~/.zshrc
 
 ---
 
-**Версия**: 1.0  
-**Дата**: 2025-11-10  
-**Платформа**: Windows 11 + WSL Ubuntu
+## 💻 PowerShell версия
+
+Если вы используете **PowerShell** вместо WSL, установите PowerShell версию алиасов:
+
+```powershell
+# Перейдите в папку проекта
+cd C:\Project\terminal-configs\windows\powershell
+
+# Запустите установку
+.\install.ps1
+```
+
+**Документация**: [powershell/README.md](../powershell/README.md)
+
+**Примечание**: PowerShell алиасы работают в Windows PowerShell, но некоторые команды (gq, ps, backup) требуют WSL для выполнения скриптов.
+
+---
+
+**Версия**: 1.1  
+**Дата**: 2025-01-XX  
+**Платформа**: Windows 11 + WSL Ubuntu / PowerShell
 
 **Приятного использования! 🚀**
 
