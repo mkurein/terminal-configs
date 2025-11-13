@@ -1,5 +1,7 @@
 alias n=nvim
 
+# Note: Windows-specific aliases (like 'alias open=explorer.exe') are removed for macOS compatibility
+
 # ===== QUICK ALIASES =====
 alias c='clear'
 alias ..='cd ..'

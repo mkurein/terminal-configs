@@ -2,7 +2,9 @@
 
 > **Статус**: Готово ✅ | Конфигурационные файлы ✅ | Документация ✅
 
-Конфигурация терминала для **Windows 11 + WSL Debian** с **Alacritty + Zellij + LazyVim**.
+Конфигурация терминала для **Windows 11 + WSL (Debian / Ubuntu)** с **Alacritty + Zellij + LazyVim**.
+
+> 💡 **Поддержка нескольких дистрибутивов WSL**: Теперь можно легко переключаться между Debian и Ubuntu!
 
 ## 📦 Что включено
 
@@ -65,7 +67,71 @@ choco install alacritty
 Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
 ```
 
-### 5. Перезапустите Alacritty
+### 5. Выберите дистрибутив WSL (опционально)
+
+Проект предоставляет 3 конфигурации Alacritty:
+
+#### 🎯 Вариант 1: Использовать дефолтный WSL (Рекомендуется)
+
+Используйте основной `alacritty.toml` - он автоматически запускает ваш дефолтный WSL дистрибутив.
+
+**Смена дефолтного дистрибутива:**
+```powershell
+# Показать все установленные дистрибутивы
+wsl --list --verbose
+
+# Установить Ubuntu как дефолтный
+wsl --set-default Ubuntu
+
+# Или Debian
+wsl --set-default Debian
+```
+
+#### 🎯 Вариант 2: Использовать конкретный дистрибутив
+
+Если у вас установлены оба дистрибутива и вы хотите запускать конкретный:
+
+**Для Debian:**
+```powershell
+# Скопируйте нужный конфиг
+copy alacritty-debian.toml %USERPROFILE%\.config\alacritty\
+
+# Запуск через bat-файл
+wa-debian.bat
+
+# Или напрямую
+alacritty --config-file alacritty-debian.toml
+```
+
+**Для Ubuntu:**
+```powershell
+# Скопируйте нужный конфиг
+copy alacritty-ubuntu.toml %USERPROFILE%\.config\alacritty\
+
+# Запуск через bat-файл
+wa-ubuntu.bat
+
+# Или напрямую
+alacritty --config-file alacritty-ubuntu.toml
+```
+
+#### 📂 Файлы конфигурации:
+
+| Файл | Дистрибутив | Описание |
+|------|-------------|----------|
+| `alacritty.toml` | Дефолтный WSL | Использует `wsl --set-default` |
+| `alacritty-debian.toml` | Debian | Явно указан `-d Debian` |
+| `alacritty-ubuntu.toml` | Ubuntu | Явно указан `-d Ubuntu` |
+
+#### 🚀 Bat-файлы для быстрого запуска:
+
+| Файл | Запускает | Использование |
+|------|-----------|---------------|
+| `wa.bat` | Дефолтный WSL | Основной запуск |
+| `wa-debian.bat` | Debian | Запуск с Debian |
+| `wa-ubuntu.bat` | Ubuntu | Запуск с Ubuntu |
+
+### 6. Перезапустите Alacritty
 
 Откройте Alacritty → появится меню выбора workspace! 🎉
 

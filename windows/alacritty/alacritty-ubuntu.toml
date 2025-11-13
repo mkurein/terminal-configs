@@ -1,12 +1,8 @@
-# Alacritty Configuration для Windows + WSL + Zellij
+# Alacritty Configuration для Windows + WSL Ubuntu + Zellij
 # С поддержкой Alt+стрелки для навигации
 #
-# Этот файл использует ДЕФОЛТНЫЙ WSL дистрибутив
-# Чтобы изменить дефолтный дистрибутив: wsl --set-default Ubuntu (или Debian)
-#
-# Для конкретного дистрибутива используйте:
-#   - alacritty-debian.toml (запуск: wa-debian.bat)
-#   - alacritty-ubuntu.toml (запуск: wa-ubuntu.bat)
+# Использование: alacritty --config-file alacritty-ubuntu.toml
+# Или через: wa-ubuntu.bat
 
 [general]
 import = [
@@ -25,6 +21,8 @@ TERM = "xterm-256color"
 [terminal.shell]
 program = "wsl"
 args = [
+    "-d",
+    "Ubuntu",
     "--cd",
     "~",
     "--exec",
