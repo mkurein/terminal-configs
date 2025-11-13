@@ -24,6 +24,14 @@ function gc { param([string]$message) git commit -m $message }
 function gp { git push }
 function gl { git log --oneline --graph --decorate -20 }
 function gd { git diff }
+function gb { 
+    param([switch]$a)
+    if ($a) { 
+        git branch -a 
+    } else { 
+        git branch 
+    }
+}
 function glog { git log --oneline --graph --decorate --all }
 
 # ===== WINDOWS INTEGRATION =====

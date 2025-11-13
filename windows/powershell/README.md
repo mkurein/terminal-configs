@@ -69,6 +69,8 @@ gc "message"   # git commit -m "message"
 gp              # git push
 gl              # git log (красиво)
 gd              # git diff
+gb              # git branch (локальные ветки)
+gb -a           # git branch -a (все ветки)
 glog            # git log --all --graph
 ```
 
