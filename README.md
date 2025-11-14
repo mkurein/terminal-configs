@@ -179,6 +179,210 @@ terminal-configs/
 
 ---
 
+## 🔧 Настройка под себя
+
+### 🪟 Windows + WSL
+
+#### Добавить свои алиасы
+
+Алиасы находятся в файле `~/.config/zsh/aliases.zsh` в WSL (или `windows/zsh/aliases.zsh` в репозитории).
+
+**Добавление нового алиаса:**
+
+1. Откройте файл в WSL:
+```bash
+# В WSL
+nvim ~/.config/zsh/aliases.zsh
+# или
+n ~/.config/zsh/aliases.zsh
+```
+
+2. Добавьте алиас в нужную секцию:
+```bash
+# Git shortcuts
+alias g='git'
+alias gs='git status'
+alias gb='git branch'              # ваш новый алиас
+alias gba='git branch -a'          # ещё один
+# ... и т.д.
+```
+
+3. Сохраните файл и перезагрузите конфигурацию:
+```bash
+source ~/.zshrc
+```
+
+4. Или откройте новое окно Alacritty - алиасы загрузятся автоматически.
+
+**Примеры полезных алиасов:**
+```bash
+# Git
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gst='git stash'
+alias gsp='git stash pop'
+
+# Навигация
+alias ll='ls -lah'
+alias la='ls -la'
+
+# WSL специфичные
+alias explorer='explorer.exe .'    # открыть текущую папку в Windows Explorer
+alias code='code .'                 # открыть в VSCode
+```
+
+**Важно:** После добавления алиасов в репозиторий:
+```bash
+# В WSL
+cd ~/terminal-configs/windows
+./install.sh
+
+# Или вручную
+cp windows/zsh/aliases.zsh ~/.config/zsh/aliases.zsh
+```
+
+#### Добавить горячие клавиши в Alacritty (Windows)
+
+Горячие клавиши настраиваются в `%APPDATA%\alacritty\alacritty.toml` (Windows) или `~/.config/alacritty/alacritty.toml` (WSL).
+
+**Добавление новой горячей клавиши:**
+
+1. Откройте конфигурацию:
+```powershell
+# В PowerShell
+notepad $env:APPDATA\alacritty\alacritty.toml
+
+# Или в WSL
+n ~/.config/alacritty/alacritty.toml
+```
+
+2. Найдите секцию `[[keyboard.bindings]]` и добавьте новую привязку:
+```toml
+# Пример: Ctrl+Shift+T для нового окна
+[[keyboard.bindings]]
+key = "T"
+mods = "Control|Shift"
+action = "SpawnNewInstance"
+
+# Пример: F12 для полноэкранного режима
+[[keyboard.bindings]]
+key = "F12"
+action = "ToggleFullscreen"
+
+# Пример: Alt+стрелки для Zellij (уже есть в конфиге)
+[[keyboard.bindings]]
+key = "Left"
+mods = "Alt"
+chars = "\u001b[1;3D"
+```
+
+3. Перезапустите Alacritty - изменения применятся автоматически.
+
+**Доступные действия:**
+- `SpawnNewInstance` - новое окно Alacritty
+- `ToggleFullscreen` - полноэкранный режим
+- `IncreaseFontSize` / `DecreaseFontSize` - размер шрифта
+- `Copy` / `Paste` - копирование/вставка
+- `chars = "..."` - отправить символы/escape-последовательности (для Zellij)
+
+**Модификаторы:**
+- `Control` или `Ctrl`
+- `Shift`
+- `Alt`
+- `Command` или `Super` (на Windows обычно не используется)
+
+**Примеры полезных привязок для Windows:**
+```toml
+# Увеличение/уменьшение шрифта
+[[keyboard.bindings]]
+key = "Plus"
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Minus"
+mods = "Control"
+action = "DecreaseFontSize"
+
+# Копирование/вставка (Windows стиль)
+[[keyboard.bindings]]
+key = "C"
+mods = "Control|Shift"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "V"
+mods = "Control|Shift"
+action = "Paste"
+```
+
+#### Добавить горячие клавиши в Zellij (WSL)
+
+Горячие клавиши Zellij настраиваются в `~/.config/zellij/config.kdl` в WSL.
+
+**Добавление новой привязки:**
+
+1. Откройте конфигурацию в WSL:
+```bash
+n ~/.config/zellij/config.kdl
+```
+
+2. Найдите секцию `keybinds` и добавьте новую привязку:
+```kdl
+keybinds {
+    shared {
+        // Ваша новая привязка
+        bind "Ctrl g" { SwitchToMode "Normal"; }
+        bind "Ctrl h" { GoToNextTab; }
+    }
+}
+```
+
+3. Перезапустите Zellij или нажмите `Ctrl + p` → `r` для перезагрузки конфигурации.
+
+**Полезные привязки для Zellij:**
+```kdl
+keybinds {
+    shared {
+        // Быстрое переключение между табами
+        bind "Alt 1" { GoToTab 1; }
+        bind "Alt 2" { GoToTab 2; }
+        
+        // Создание новой панели
+        bind "Ctrl n" { NewPane; }
+        bind "Ctrl Shift n" { NewPane "Down"; }
+        
+        // Закрытие панели
+        bind "Ctrl x" { ClosePane; }
+        
+        // Переключение между панелями (Alt+стрелки уже настроены в Alacritty)
+        bind "Alt Left" { MoveFocus "Left"; }
+        bind "Alt Right" { MoveFocus "Right"; }
+    }
+}
+```
+
+**Режимы Zellij:**
+- `Normal` - обычный режим
+- `Locked` - заблокированный режим
+- `Resize` - режим изменения размера
+- `Pane` - режим работы с панелями
+- `Tab` - режим работы с табами
+- `Scroll` - режим прокрутки
+
+**Важно:** Горячие клавиши для Zellij работают через Alacritty, поэтому:
+1. Сначала настройте привязку в Alacritty (`alacritty.toml`) для отправки нужных escape-последовательностей
+2. Затем настройте обработку этих последовательностей в Zellij (`config.kdl`)
+
+### 🍎 macOS
+
+См. подробные инструкции в [macos/README.md](./macos/README.md#-настройка-под-себя):
+- Добавить свои алиасы
+- Добавить горячие клавиши в Alacritty
+- Добавить горячие клавиши в Zellij
+
+---
+
 ## 📝 Changelog
 
 ### v2.1 - 2025-11-10 (Windows)

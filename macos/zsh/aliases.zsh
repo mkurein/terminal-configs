@@ -17,6 +17,9 @@ alias gc='git commit -m'
 alias gp='git push'
 alias gl='git log --oneline --graph --decorate -20 | cat'
 alias gd='git diff'
+alias gb='git branch'              # локальные ветки
+alias gba='git branch -a'         # все ветки (локальные + удалённые)
+alias gbv='git branch -v'         # ветки с последним коммитом
 
 # Docker shortcuts (если используете)
 alias d='docker'
