@@ -14,9 +14,10 @@ fi
 echo "Выберите workspace layout:"
 echo "1) workspaceVPNmanage (40% лево / 60% право) - для VPNserverManage"
 echo "2) workspaceVPNmanage-5050 (50% / 50%) - для VPNserverManage"
-echo "3) Запустить без layout"
+echo "3) workspaceBOMCategorizer - для BOM Categorizer"
+echo "4) Запустить без layout"
 echo ""
-read -p "Ваш выбор (1-3): " choice
+read -p "Ваш выбор (1-4): " choice
 
 case $choice in
     1)
@@ -28,6 +29,10 @@ case $choice in
         exec zellij --layout "$HOME/.config/zellij/layouts/workspaceVPNmanage-5050.kdl"
         ;;
     3)
+        echo "Запускаю workspaceBOMCategorizer..."
+        exec zellij --layout "$HOME/.config/zellij/layouts/workspaceBOMCat.kdl"
+        ;;
+    4)
         echo "Запускаю без layout..."
         exec zellij
         ;;
