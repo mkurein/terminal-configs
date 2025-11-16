@@ -67,14 +67,19 @@ gs              # git status
 ga              # git add .
 gc "message"   # git commit -m "message"
 gp              # git push
-gl              # git log (красиво)
+gl              # git pull
+gll             # git log --oneline --graph --decorate -20
+glog            # git log --all --graph --decorate
 gd              # git diff
+gco branch      # git checkout branch
 gb              # git branch (локальные ветки)
 gb -a           # git branch -a (все ветки)
-glog            # git log --all --graph
+gb -v           # git branch -v (с последним коммитом)
+gba             # git branch -a (все ветки)
+gbv             # git branch -v (с последним коммитом)
 ```
 
-### Git Quick (через WSL)
+### Git Quick (PowerShell Native)
 
 ```powershell
 gq status           # git status
@@ -82,6 +87,8 @@ gq add              # git add .
 gq commit "msg"     # git commit -m "msg"
 gq push             # git push
 gq acp "message"    # add + commit + push (SUPER COMMAND!)
+gq sync             # Синхронизация с main/master
+gq undo             # Отменить последний коммит
 gq-help             # Показать справку
 ```
 
@@ -111,6 +118,7 @@ mkcd folder         # Создать папку и перейти в неё
 ff name             # Найти файл по имени
 search text         # Поиск в содержимом файлов
 dirsize             # Размер текущей папки
+du path             # Размер папки/файла (альтернатива dirsize)
 serve 3000          # Запустить веб-сервер на порту 3000
 myip                # Показать IP адрес
 ports               # Показать открытые порты
@@ -118,6 +126,10 @@ update              # Обновить систему WSL
 install pkg         # Установить пакет в WSL
 h                   # История команд
 df                  # Место на дисках
+psgrep name         # Найти процессы по имени
+code .              # Открыть в VSCode
+extract file.zip    # Извлечь архив (.zip, .7z, .rar, .tar, .gz)
+pwgen 20            # Сгенерировать пароль (20 символов)
 ```
 
 ### Python
@@ -140,9 +152,9 @@ dpa                 # docker ps -a
 
 ## ⚠️ Важные замечания
 
-1. **WSL команды**: Некоторые команды (`gq`, `ps`, `backup`, и т.д.) работают через WSL, поэтому требуют установленного WSL.
+1. **WSL команды**: Некоторые команды (`ps`, `backup`, `sync`, `devenv`, `clean`) работают через WSL, поэтому требуют установленного WSL.
 
-2. **Git Quick**: Команда `gq acp` работает через WSL и требует установленных скриптов в `~/` в WSL.
+2. **Git Quick**: Команда `gq` работает нативно в PowerShell и не требует WSL. Это полнофункциональная реализация Git Quick команд.
 
 3. **Пути**: Команды работают с Windows путями, но WSL команды автоматически конвертируют пути.
 
@@ -176,7 +188,13 @@ code $PROFILE
 
 ---
 
-**Версия**: 1.0  
-**Дата**: 2025-01-XX  
+**Версия**: 1.1  
+**Дата**: 2025-11-14  
 **Платформа**: Windows 11 + PowerShell
+
+### Что нового в v1.1:
+- ✅ Добавлены все алиасы из zsh конфигурации
+- ✅ Git Quick работает нативно в PowerShell (не требует WSL)
+- ✅ Новые функции: `psgrep`, `code`, `extract`, `pwgen`, `du`
+- ✅ Дополнительные Git алиасы: `gl` (pull), `gll` (log), `gco`, `gba`, `gbv`
 

@@ -180,6 +180,183 @@ cp ~/.config/zellij/layouts/workspaceVPNmanage.kdl ~/.config/zellij/layouts/my-l
 
 3. Добавьте в `start-zellij-choose.sh` новый пункт меню
 
+### Добавить свои алиасы
+
+Алиасы находятся в файле `~/.config/zsh/aliases.zsh` (или `macos/zsh/aliases.zsh` в репозитории).
+
+**Добавление нового алиаса:**
+
+1. Откройте файл:
+```bash
+nvim ~/.config/zsh/aliases.zsh
+# или
+n ~/.config/zsh/aliases.zsh
+```
+
+2. Добавьте алиас в нужную секцию (Git, Python, Docker и т.д.):
+```bash
+# Git shortcuts
+alias g='git'
+alias gs='git status'
+alias gb='git branch'              # ваш новый алиас
+alias gba='git branch -a'          # ещё один
+# ... и т.д.
+```
+
+3. Сохраните файл и перезагрузите конфигурацию:
+```bash
+source ~/.zshrc
+```
+
+4. Или откройте новое окно терминала - алиасы загрузятся автоматически.
+
+**Примеры полезных алиасов:**
+```bash
+# Git
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gst='git stash'
+alias gsp='git stash pop'
+
+# Навигация
+alias ll='ls -lah'
+alias la='ls -la'
+
+# Редакторы
+alias v='vim'
+alias e='code'  # или 'nvim'
+
+# Система
+alias ports='lsof -i -P -n | grep LISTEN'
+alias reload='source ~/.zshrc'
+```
+
+**Важно:** После добавления алиасов в репозиторий, не забудьте:
+```bash
+# Обновить локальный файл
+cp ~/Project/terminal-configs/macos/zsh/aliases.zsh ~/.config/zsh/aliases.zsh
+
+# Или запустить install.sh
+cd ~/Project/terminal-configs/macos
+./install.sh
+```
+
+### Добавить горячие клавиши в Alacritty
+
+Горячие клавиши настраиваются в `~/.config/alacritty/alacritty.toml`.
+
+**Добавление новой горячей клавиши:**
+
+1. Откройте конфигурацию:
+```bash
+n ~/.config/alacritty/alacritty.toml
+```
+
+2. Найдите секцию `[[keyboard.bindings]]` и добавьте новую привязку:
+```toml
+# Пример: Ctrl+Shift+T для нового таба
+[[keyboard.bindings]]
+key = "T"
+mods = "Control|Shift"
+action = "SpawnNewInstance"
+
+# Пример: F12 для полноэкранного режима
+[[keyboard.bindings]]
+key = "F12"
+action = "ToggleFullscreen"
+
+# Пример: Кастомная команда
+[[keyboard.bindings]]
+key = "K"
+mods = "Control|Shift"
+chars = "\u000c"  # Ctrl+L для очистки экрана
+```
+
+3. Перезапустите Alacritty - изменения применятся автоматически.
+
+**Доступные действия:**
+- `SpawnNewInstance` - новое окно Alacritty
+- `ToggleFullscreen` - полноэкранный режим
+- `IncreaseFontSize` / `DecreaseFontSize` - размер шрифта
+- `Copy` / `Paste` - копирование/вставка
+- `chars = "..."` - отправить символы/escape-последовательности
+
+**Модификаторы:**
+- `Control` или `Ctrl`
+- `Shift`
+- `Alt` или `Option` (на macOS)
+- `Command` или `Super` (на macOS)
+
+**Примеры полезных привязок:**
+```toml
+# Увеличение/уменьшение шрифта
+[[keyboard.bindings]]
+key = "Plus"
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Minus"
+mods = "Control"
+action = "DecreaseFontSize"
+
+# Сброс размера шрифта
+[[keyboard.bindings]]
+key = "Key0"
+mods = "Control"
+action = "ResetFontSize"
+```
+
+### Добавить горячие клавиши в Zellij
+
+Горячие клавиши Zellij настраиваются в `~/.config/zellij/config.kdl`.
+
+**Добавление новой привязки:**
+
+1. Откройте конфигурацию:
+```bash
+n ~/.config/zellij/config.kdl
+```
+
+2. Найдите секцию `keybinds` и добавьте новую привязку:
+```kdl
+keybinds {
+    shared {
+        // Ваша новая привязка
+        bind "Ctrl g" { SwitchToMode "Normal"; }
+        bind "Ctrl h" { GoToNextTab; }
+    }
+}
+```
+
+3. Перезапустите Zellij или нажмите `Ctrl + p` → `r` для перезагрузки конфигурации.
+
+**Полезные привязки для Zellij:**
+```kdl
+keybinds {
+    shared {
+        // Быстрое переключение между табами
+        bind "Alt 1" { GoToTab 1; }
+        bind "Alt 2" { GoToTab 2; }
+        
+        // Создание новой панели в разных направлениях
+        bind "Ctrl n" { NewPane; }
+        bind "Ctrl Shift n" { NewPane "Down"; }
+        
+        // Закрытие панели
+        bind "Ctrl x" { ClosePane; }
+    }
+}
+```
+
+**Режимы Zellij:**
+- `Normal` - обычный режим
+- `Locked` - заблокированный режим
+- `Resize` - режим изменения размера
+- `Pane` - режим работы с панелями
+- `Tab` - режим работы с табами
+- `Scroll` - режим прокрутки
+
 ## ⚙️ Ручная установка
 
 Если не хотите использовать `install.sh`:

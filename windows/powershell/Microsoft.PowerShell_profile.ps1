@@ -22,17 +22,23 @@ function gs { git status }
 function ga { git add . }
 function gc { param([string]$message) git commit -m $message }
 function gp { git push }
-function gl { git log --oneline --graph --decorate -20 }
+function gl { git pull }
+function glog { git log --oneline --graph --decorate --all }
+function gll { git log --oneline --graph --decorate -20 }
 function gd { git diff }
+function gco { param([string]$branch) git checkout $branch }
 function gb { 
-    param([switch]$a)
+    param([switch]$a, [switch]$v)
     if ($a) { 
         git branch -a 
+    } elseif ($v) {
+        git branch -v
     } else { 
         git branch 
     }
 }
-function glog { git log --oneline --graph --decorate --all }
+function gba { git branch -a }
+function gbv { git branch -v }
 
 # ===== WINDOWS INTEGRATION =====
 function open { param([string]$path = ".") explorer.exe $path }
@@ -218,6 +224,119 @@ function install {
 # История команд
 function h {
     Get-History | Format-Table -AutoSize
+}
+
+# Поиск процессов по имени
+function psgrep {
+    param([string]$name)
+    Get-Process | Where-Object {$_.ProcessName -like "*$name*"} | Format-Table -AutoSize
+}
+
+# Открыть в VSCode
+function code {
+    param([string]$path = ".")
+    if (Get-Command code -ErrorAction SilentlyContinue) {
+        & code $path
+    } else {
+        $codePath = "${env:ProgramFiles}\Microsoft VS Code\Code.exe"
+        if (Test-Path $codePath) {
+            & $codePath $path
+        } else {
+            Write-Host "VSCode не найден. Установите VSCode или добавьте в PATH." -ForegroundColor Red
+        }
+    }
+}
+
+# Генератор паролей
+function pwgen {
+    param([int]$length = 20)
+    $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#%^&*()_+=-{}[]:;<>,.?/"
+    $password = ""
+    for ($i = 0; $i -lt $length; $i++) {
+        $password += $chars[(Get-Random -Maximum $chars.Length)]
+    }
+    return $password
+}
+
+# Извлечь архив
+function extract {
+    param([string]$file)
+    if (-not (Test-Path $file)) {
+        Write-Host "Файл не найден: $file" -ForegroundColor Red
+        return
+    }
+    
+    $extension = [System.IO.Path]::GetExtension($file).ToLower()
+    $destination = [System.IO.Path]::GetDirectoryName($file)
+    
+    switch ($extension) {
+        ".zip" {
+            Expand-Archive -Path $file -DestinationPath $destination -Force
+            Write-Host "✓ ZIP архив извлечен" -ForegroundColor Green
+        }
+        ".7z" {
+            if (Get-Command 7z -ErrorAction SilentlyContinue) {
+                & 7z x $file -o"$destination" -y
+                Write-Host "✓ 7Z архив извлечен" -ForegroundColor Green
+            } else {
+                Write-Host "7z не установлен. Установите 7-Zip." -ForegroundColor Red
+            }
+        }
+        ".rar" {
+            if (Get-Command unrar -ErrorAction SilentlyContinue) {
+                & unrar x $file $destination
+                Write-Host "✓ RAR архив извлечен" -ForegroundColor Green
+            } else {
+                Write-Host "unrar не установлен. Установите WinRAR или unrar." -ForegroundColor Red
+            }
+        }
+        ".tar" {
+            if (Get-Command tar -ErrorAction SilentlyContinue) {
+                & tar -xf $file -C $destination
+                Write-Host "✓ TAR архив извлечен" -ForegroundColor Green
+            } else {
+                Write-Host "tar не найден" -ForegroundColor Red
+            }
+        }
+        ".gz" {
+            if (Get-Command tar -ErrorAction SilentlyContinue) {
+                & tar -xzf $file -C $destination
+                Write-Host "✓ GZ архив извлечен" -ForegroundColor Green
+            } else {
+                Write-Host "tar не найден" -ForegroundColor Red
+            }
+        }
+        default {
+            Write-Host "Неподдерживаемый формат архива: $extension" -ForegroundColor Red
+            Write-Host "Поддерживаются: .zip, .7z, .rar, .tar, .gz" -ForegroundColor Yellow
+        }
+    }
+}
+
+# Размер папок (du)
+function du {
+    param([string]$path = ".")
+    if (-not (Test-Path $path)) {
+        Write-Host "Путь не найден: $path" -ForegroundColor Red
+        return
+    }
+    
+    if ((Get-Item $path).PSIsContainer) {
+        $size = (Get-ChildItem -Path $path -Recurse -ErrorAction SilentlyContinue | 
+                 Measure-Object -Property Length -Sum).Sum
+        $sizeGB = [math]::Round($size / 1GB, 2)
+        $sizeMB = [math]::Round($size / 1MB, 2)
+        
+        if ($sizeGB -ge 1) {
+            Write-Host "$sizeGB GB  $path"
+        } else {
+            Write-Host "$sizeMB MB  $path"
+        }
+    } else {
+        $size = (Get-Item $path).Length
+        $sizeMB = [math]::Round($size / 1MB, 2)
+        Write-Host "$sizeMB MB  $path"
+    }
 }
 
 # ===== SYSTEM INFO =====
