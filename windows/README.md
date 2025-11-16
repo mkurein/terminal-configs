@@ -2,17 +2,20 @@
 
 > **Статус**: Готово ✅ | Конфигурационные файлы ✅ | Документация ✅
 
-Конфигурация терминала для **Windows 11 + WSL (Debian / Ubuntu)** с **Alacritty + Zellij + LazyVim**.
+Конфигурация терминала для **Windows 11 + WSL (Debian / Ubuntu)** с **Alacritty / WezTerm + Zellij + LazyVim**.
 
-> 💡 **Поддержка нескольких дистрибутивов WSL**: Теперь можно легко переключаться между Debian и Ubuntu!
+> 💡 **Поддержка нескольких терминалов**: Alacritty (минималистичный, быстрый) или WezTerm (с Kitty graphics)  
+> 💡 **Поддержка нескольких дистрибутивов WSL**: Debian и Ubuntu!
 
 ## 📦 Что включено
 
-- ✅ **Alacritty** (Windows) - быстрый GPU-ускоренный терминал с интеграцией WSL
+- ✅ **Alacritty** (Windows) - самый быстрый GPU-ускоренный терминал с интеграцией WSL
+- ✅ **WezTerm** (Windows) - современный терминал с Kitty graphics и inline-изображениями ⭐ NEW!
 - ✅ **Zellij** (WSL) - terminal multiplexer с персистентностью
 - ✅ **LazyVim** (WSL) - готовая сборка Neovim с плагинами
+- ✅ **PowerShell aliases** - алиасы для PowerShell (gs, gq, gb и др.) ⭐ NEW!
 - ✅ **Workspace layouts** - готовые конфигурации (40/60 и 50/50)
-- ✅ **Автозапуск** - Zellij запускается автоматически из Alacritty
+- ✅ **Автозапуск** - Zellij запускается автоматически
 - ✅ **Интерактивное меню** - выбор layout при запуске
 - ✅ **Alt+стрелки** - навигация между панелями Zellij
 
@@ -165,6 +168,15 @@ alacritty --config-file alacritty-ubuntu.toml
   - LSP и автодополнение
   - Менеджеры плагинов (Lazy.nvim)
 
+- **[🚀 WezTerm Setup](./docs/WEZTERM_SETUP.md)** ⭐ NEW!  
+  Полное руководство по WezTerm:
+  - Установка и конфигурация WezTerm
+  - GPU-ускорение и производительность
+  - Kitty graphics protocol (inline-изображения)
+  - Интеграция с WSL и Zellij
+  - Темы и шрифты
+  - Сравнение с Alacritty
+
 - **[🚀 LazyVim Setup](./docs/LAZYVIM_SETUP.md)**  
   Краткое руководство по LazyVim:
   - Установка LazyVim в WSL
@@ -173,7 +185,7 @@ alacritty --config-file alacritty-ubuntu.toml
   - Добавление плагинов
   - Кастомизация и настройка
 
-- **[⚡ Productivity Tools](./docs/PRODUCTIVITY_TOOLS.md)** ✨ NEW!  
+- **[⚡ Productivity Tools](./docs/PRODUCTIVITY_TOOLS.md)**  
   Инструменты для повышения продуктивности:
   - Project Switcher - быстрое переключение между проектами
   - Backup & Sync - резервное копирование и синхронизация конфигов
@@ -182,7 +194,7 @@ alacritty --config-file alacritty-ubuntu.toml
   - Clean System - очистка и обслуживание WSL
   - Полезные алиасы и функции
 
-- **[📁 WSL File Operations](./docs/WSL_FILE_OPERATIONS.md)** ✨ NEW!  
+- **[📁 WSL File Operations](./docs/WSL_FILE_OPERATIONS.md)**  
   Работа с файлами между WSL и Windows:
   - Копирование файлов (4 способа)
   - Буфер обмена (win32yank)
@@ -191,7 +203,7 @@ alacritty --config-file alacritty-ubuntu.toml
   - Best practices и оптимизация производительности
   - Troubleshooting
 
-- **[🚀 Useful Aliases & Commands](./docs/USEFUL_ALIASES.md)** ✨ NEW!  
+- **[🚀 Useful Aliases & Commands](./docs/USEFUL_ALIASES.md)**  
   Полный справочник по всем командам и алиасам:
   - 32+ алиасов для повседневной работы
   - Git quick commands (gq acp - add+commit+push!)
@@ -200,15 +212,37 @@ alacritty --config-file alacritty-ubuntu.toml
   - Zellij и LazyVim горячие клавиши
   - Готовые workflows для типичных задач
 
+- **[💻 PowerShell Aliases](./powershell/README.md)** ⭐ NEW!  
+  Алиасы для PowerShell:
+  - Установка и настройка профиля
+  - Git команды (gs, ga, gc, gp, gb, gq)
+  - Навигация и файловые операции
+  - Windows интеграция
+  - Полный список команд
+
 ---
 
 ## 🚀 Быстрый запуск из проводника Windows
 
-### Открытие Alacritty в текущей папке
+### Открытие терминала в текущей папке
+
+Доступны скрипты для запуска терминалов прямо из проводника Windows.
+
+#### Alacritty (`wa.bat`)
 
 Файл `wa.bat` позволяет открыть Alacritty прямо из проводника Windows в текущей папке.
 
-📖 **Подробная инструкция по установке:** [INSTALL_WA.md](./INSTALL_WA.md)
+#### WezTerm (`ww.bat`) ⭐ NEW!
+
+Файл `ww.bat` позволяет открыть WezTerm в текущей папке с поддержкой inline-изображений.
+
+**Использование:**
+- В адресной строке проводника введите `ww` и нажмите Enter
+- WezTerm откроется в WSL в этой папке!
+
+📖 **Подробная инструкция:**
+- Alacritty: [INSTALL_WA.md](./INSTALL_WA.md)
+- WezTerm: [INSTALL_WW.md](./INSTALL_WW.md)
 
 **Что делает скрипт:**
 1. Получает текущий путь Windows
@@ -454,10 +488,26 @@ Copy-Item terminal-configs\windows\alacritty\alacritty.toml $env:APPDATA\alacrit
 
 ---
 
-**Версия**: 2.0 (полная конфигурация)
-**Дата**: 2025-11-09
-**Платформа**: Windows 11 + WSL Debian
-**Компоненты**: Alacritty, Zellij, LazyVim, Zsh
+## 🆚 Выбор терминала: Alacritty vs WezTerm
+
+| Функция | Alacritty | WezTerm |
+|---------|-----------|---------|
+| **Скорость** | ⭐⭐⭐⭐⭐ Самый быстрый | ⭐⭐⭐⭐ Очень быстрый |
+| **Размер** | ~8 MB | ~30 MB |
+| **Конфигурация** | TOML | Lua (программируемая) |
+| **Kitty graphics** | ❌ | ✅ |
+| **Inline-изображения** | ❌ | ✅ |
+| **Встроенные вкладки** | ❌ | ✅ |
+| **Рекомендация** | Для максимальной скорости | Для rich-контента |
+
+**Установить оба?** Можно использовать оба терминала параллельно! 🚀
+
+---
+
+**Версия**: 2.1 (полная конфигурация + WezTerm + PowerShell aliases)
+**Дата**: 2025-01-XX
+**Платформа**: Windows 11 + WSL (Debian / Ubuntu)
+**Компоненты**: Alacritty, WezTerm, Zellij, LazyVim, Zsh, PowerShell
 
 **См. также:** [macOS конфигурация](../macos/) - аналогичная структура для macOS
 

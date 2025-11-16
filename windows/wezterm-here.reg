@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00
+
+; Добавить "Open WezTerm Here" в контекстное меню
+; ВАЖНО: Измените путь к ww.bat на ваш!
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\WeztermHere]
+@="Open WezTerm Here"
+"Icon"="C:\\Program Files\\WezTerm\\wezterm-gui.exe"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\WeztermHere\command]
+@="\"C:\\Project\\terminal-configs\\windows\\ww.bat\""
+
