@@ -244,10 +244,17 @@ alacritty --config-file alacritty-ubuntu.toml
 - Alacritty: [INSTALL_WA.md](./INSTALL_WA.md)
 - WezTerm: [INSTALL_WW.md](./INSTALL_WW.md)
 
+#### Запуск из папки проекта (Desktop shortcut) ⭐ NEW!
+
+Файлы для создания ярлыков на рабочем столе или в папках проектов:
+- `alacritty-desktop.bat` — двойной клик открывает Alacritty в текущей папке WSL
+- `wezterm-desktop.bat` — двойной клик открывает WezTerm в текущей папке WSL
+- Просто скопируйте нужный файл в папку проекта или на рабочий стол и запускайте!
+
 **Что делает скрипт:**
 1. Получает текущий путь Windows
 2. Конвертирует его в WSL путь
-3. Открывает Alacritty с переходом в эту папку в WSL
+3. Открывает терминал с переходом в эту папку в WSL
 
 ### Способы использования:
 
