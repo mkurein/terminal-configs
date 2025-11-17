@@ -4,15 +4,30 @@ REM Использует конфигурацию alacritty-debian.toml
 
 set CONFIG_DIR=%USERPROFILE%\.config\alacritty
 set CONFIG_FILE=%CONFIG_DIR%\alacritty-debian.toml
+set SOURCE_CONFIG=%~dp0alacritty\alacritty-debian.toml
 
+REM Создать директорию, если её нет
+if not exist "%CONFIG_DIR%" (
+    echo Создание директории: %CONFIG_DIR%
+    mkdir "%CONFIG_DIR%"
+)
+
+REM Скопировать конфигурацию, если её нет
 if not exist "%CONFIG_FILE%" (
-    echo [ERROR] Конфигурационный файл не найден: %CONFIG_FILE%
-    echo.
-    echo Убедитесь, что вы скопировали alacritty-debian.toml в директорию:
-    echo %CONFIG_DIR%\
-    echo.
-    pause
-    exit /b 1
+    if exist "%SOURCE_CONFIG%" (
+        echo Копирование конфигурации из %SOURCE_CONFIG%
+        copy "%SOURCE_CONFIG%" "%CONFIG_FILE%" >nul
+        echo Конфигурация скопирована успешно!
+        echo.
+    ) else (
+        echo [ERROR] Исходный файл конфигурации не найден: %SOURCE_CONFIG%
+        echo.
+        echo Убедитесь, что файл находится в:
+        echo %~dp0alacritty\alacritty-debian.toml
+        echo.
+        pause
+        exit /b 1
+    )
 )
 
 echo Запуск Alacritty с WSL Debian...

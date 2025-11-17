@@ -15,27 +15,64 @@ REM   в адресной строке проводника (работает с
 REM 
 REM ============================================================================
 
-REM Запустить WezTerm (откроется в домашней папке WSL по умолчанию)
-REM 
-REM ПРИМЕЧАНИЕ: Автоматический переход в папку "Рабочий стол" не работает
-REM из-за проблем с кириллицей в путях OneDrive. Используйте один из вариантов:
-REM 
-REM 1. В открывшемся WezTerm выполните:
-REM    cd "/mnt/c/Users/z6364/OneDrive/Рабочий стол"
-REM 
-REM 2. Или используйте команду "ww" в адресной строке проводника
-REM    для запуска WezTerm в любой папке (работает с кириллицей!)
-REM
+setlocal
+
+set CONFIG_DIR=%USERPROFILE%\.config\wezterm
+set CONFIG_FILE=%CONFIG_DIR%\wezterm.lua
+set SOURCE_CONFIG=%~dp0wezterm\wezterm.lua
+
+REM Создать директорию для конфигурации, если её нет
+if not exist "%CONFIG_DIR%" (
+    echo Создание директории: %CONFIG_DIR%
+    mkdir "%CONFIG_DIR%"
+)
+
+REM Скопировать конфигурацию, если её нет
+if not exist "%CONFIG_FILE%" (
+    if exist "%SOURCE_CONFIG%" (
+        echo Копирование конфигурации WezTerm...
+        copy "%SOURCE_CONFIG%" "%CONFIG_FILE%" >nul
+        echo Конфигурация скопирована успешно!
+        echo.
+    )
+)
+
+REM Попробовать найти WezTerm через where (поиск в PATH)
+where wezterm-gui.exe >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    start "" wezterm-gui.exe
+    goto :end
+)
+
+REM Попробовать стандартные пути установки
 if exist "C:\Program Files\WezTerm\wezterm-gui.exe" (
     start "" "C:\Program Files\WezTerm\wezterm-gui.exe"
-) else if exist "%USERPROFILE%\.local\bin\wezterm-gui.exe" (
-    start "" "%USERPROFILE%\.local\bin\wezterm-gui.exe"
-) else (
-    echo [ERROR] WezTerm не найден!
-    echo.
-    echo Установите WezTerm:
-    echo   scoop install wezterm
-    echo.
-    pause
+    goto :end
 )
+
+if exist "%USERPROFILE%\.local\bin\wezterm-gui.exe" (
+    start "" "%USERPROFILE%\.local\bin\wezterm-gui.exe"
+    goto :end
+)
+
+if exist "%LOCALAPPDATA%\Programs\WezTerm\wezterm-gui.exe" (
+    start "" "%LOCALAPPDATA%\Programs\WezTerm\wezterm-gui.exe"
+    goto :end
+)
+
+REM WezTerm не найден
+echo [ERROR] WezTerm не найден!
+echo.
+echo Установите WezTerm одним из способов:
+echo   scoop install wezterm
+echo   choco install wezterm
+echo   winget install wez.wezterm
+echo.
+echo Или скачайте с: https://wezfurlong.org/wezterm/install/windows.html
+echo.
+pause
+exit /b 1
+
+:end
+endlocal
 

@@ -390,9 +390,10 @@ function winpath {
 }
 
 # ===== GIT QUICK COMMANDS HELP =====
-function gq-help {
+function Show-GqHelp {
     gq menu
 }
+Set-Alias -Name gq-help -Value Show-GqHelp
 
 Write-Host "✅ PowerShell aliases loaded!" -ForegroundColor Green
 Write-Host "💡 Tip: Use 'gq-help' to see Git Quick commands" -ForegroundColor Cyan

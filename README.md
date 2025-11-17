@@ -1,6 +1,6 @@
 # 🖥️ Terminal Configurations
 
-Кроссплатформенный репозиторий конфигураций для терминала с Alacritty + Zellij + Neovim.
+Кроссплатформенный репозиторий конфигураций для терминала с **Alacritty / WezTerm + Zellij + Neovim**.
 
 ## 📋 Содержание
 
@@ -30,19 +30,25 @@
 
 📖 **Документация**: 
 - [COMPLETE_SETUP_GUIDE.md](./windows/docs/COMPLETE_SETUP_GUIDE.md) - полное руководство
-- [USEFUL_ALIASES.md](./windows/docs/USEFUL_ALIASES.md) - справочник команд ✨ NEW!
+- [USEFUL_ALIASES.md](./windows/docs/USEFUL_ALIASES.md) - справочник команд
+- [WEZTERM_SETUP.md](./windows/docs/WEZTERM_SETUP.md) - установка и настройка WezTerm
+- [INSTALL_WA.md](./windows/INSTALL_WA.md) - установка команды `wa`
+- [INSTALL_WW.md](./windows/INSTALL_WW.md) - установка команды `ww`
 
-**Версия**: 2.0 (обновлено 2025-11-10)
+**Версия**: 2.2 (обновлено 2025-11-17)
 
 **Особенности**:
-- Alacritty в Windows с интеграцией WSL Ubuntu
-- Zellij с Alt+стрелки навигацией
-- LazyVim с полной настройкой
-- Готовые workspace layouts (40/60 и 50/50)
-- Автоматическое меню выбора layout
-- Скрипт установки для WSL
-- ✨ **NEW**: Productivity Tools - 6 скриптов + 32+ алиасов
-- ✨ **NEW**: Полный справочник команд и workflows
+- 🚀 **Alacritty** и **WezTerm** в Windows с полной интеграцией WSL Ubuntu
+- ⚡ **Быстрый запуск**: команды `wa` и `ww` из любой папки проводника
+- 🎯 Zellij с Alt+стрелки навигацией
+- 💻 LazyVim с полной настройкой
+- 📐 Готовые workspace layouts (40/60 и 50/50)
+- 🎨 Автоматическое меню выбора layout
+- 📦 Автоматическая установка конфигураций при первом запуске
+- 🛠️ Productivity Tools - 9 скриптов + 32+ алиасов
+- 📚 Полный справочник команд и workflows
+- 🎮 WezTerm с GPU-ускорением, Kitty graphics и inline-изображениями
+- 🔧 Поддержка Ubuntu и Debian WSL дистрибутивов
 
 ---
 
@@ -90,14 +96,42 @@ cd windows
 ./install.sh
 ```
 
-4. **Установите Alacritty в Windows** и скопируйте конфиг:
+4. **Установите терминал в Windows**:
+
+**Вариант A: Alacritty** (рекомендуется)
 ```powershell
 # PowerShell
 scoop install alacritty
-Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
+
+# Конфигурация установится автоматически при первом запуске!
+# Или скопируйте вручную:
+Copy-Item windows\alacritty\*.toml $env:USERPROFILE\.config\alacritty\
 ```
 
-5. **Откройте Alacritty** и наслаждайтесь! 🎉
+**Вариант B: WezTerm** (GPU-ускорение, inline-изображения)
+```powershell
+scoop install wezterm
+
+# Конфигурация установится автоматически при первом запуске!
+# Или скопируйте вручную:
+Copy-Item windows\wezterm\wezterm.lua $env:USERPROFILE\.config\wezterm\
+```
+
+5. **Установите быстрые команды** (опционально):
+```powershell
+# PowerShell от администратора
+# Для Alacritty
+Copy-Item windows\wa.bat C:\Windows\System32\
+
+# Для WezTerm  
+Copy-Item windows\ww.bat C:\Windows\System32\
+```
+
+Теперь можно запускать терминал из любой папки:
+- **Alacritty**: введите `wa` в адресной строке проводника
+- **WezTerm**: введите `ww` в адресной строке проводника
+
+6. **Откройте терминал** и наслаждайтесь! 🎉
 
 ---
 
@@ -131,7 +165,11 @@ terminal-configs/
     ├── README.md                          # README для Windows
     ├── install.sh                         # Скрипт установки (WSL)
     ├── alacritty/
-    │   └── alacritty.toml                 # Конфигурация Alacritty (Windows)
+    │   ├── alacritty.toml                 # Основная конфигурация Alacritty
+    │   ├── alacritty-ubuntu.toml          # Конфигурация для WSL Ubuntu
+    │   └── alacritty-debian.toml          # Конфигурация для WSL Debian
+    ├── wezterm/
+    │   └── wezterm.lua                    # Конфигурация WezTerm (GPU + Kitty)
     ├── zellij/
     │   ├── config.kdl                     # Конфигурация Zellij (WSL)
     │   └── layouts/
@@ -143,13 +181,24 @@ terminal-configs/
     │   └── start-simple.sh                # Прямой запуск 50/50
     ├── zsh/
     │   └── aliases.zsh                    # Алиасы (n=nvim)
-    ├── wa.bat                             # Запуск Alacritty из текущей папки Windows
-    ├── alacritty-here.reg                 # Добавление в контекстное меню
-    ├── INSTALL_WA.md                      # Установка wa.bat в System32
+    ├── powershell/
+    │   ├── Microsoft.PowerShell_profile.ps1  # Профиль PowerShell
+    │   └── install.ps1                    # Установка профиля PowerShell
+    ├── wa.bat                             # 🚀 Alacritty из текущей папки
+    ├── wa-ubuntu.bat                      # 🚀 Alacritty + WSL Ubuntu
+    ├── wa-debian.bat                      # 🚀 Alacritty + WSL Debian
+    ├── ww.bat                             # 🚀 WezTerm из текущей папки
+    ├── alacritty-desktop.bat              # Запуск Alacritty с рабочего стола
+    ├── wezterm-desktop.bat                # Запуск WezTerm с рабочего стола
+    ├── alacritty-here.reg                 # Добавление Alacritty в контекстное меню
+    ├── wezterm-here.reg                   # Добавление WezTerm в контекстное меню
+    ├── INSTALL_WA.md                      # Установка команды wa
+    ├── INSTALL_WW.md                      # Установка команды ww
     └── docs/
         ├── COMPLETE_SETUP_GUIDE.md        # Полное руководство (1281 строка)
         ├── LAZYVIM_SETUP.md               # Руководство по LazyVim
         ├── PRODUCTIVITY_TOOLS.md          # Инструменты продуктивности
+        ├── WEZTERM_SETUP.md               # Руководство по WezTerm
         ├── WSL_FILE_OPERATIONS.md         # Работа с файлами WSL ↔ Windows
         └── USEFUL_ALIASES.md              # Справочник команд и алиасов (32+)
 ```
@@ -169,13 +218,14 @@ terminal-configs/
 
 ### Windows + WSL
 - Windows 11 (или Windows 10 с WSL2)
-- WSL2 с Debian/Ubuntu
-- Alacritty (для Windows)
+- WSL2 с Ubuntu (или Debian)
+- **Alacritty** или **WezTerm** (для Windows)
 - Zellij (через Cargo в WSL)
 - Neovim 0.9+ (в WSL)
 - Zsh (в WSL)
 - Rust + Cargo (для Zellij)
 - htop (в WSL)
+- PowerShell 7+ (для скриптов)
 
 ---
 
@@ -384,6 +434,17 @@ keybinds {
 ---
 
 ## 📝 Changelog
+
+### v2.2 - 2025-11-17 (Windows)
+- 🚀 **Автоматическая установка конфигураций** при первом запуске bat-файлов
+- ✅ Исправлен `ww.bat` - теперь корректно запускается в WSL с zsh
+- ✅ Улучшены все bat-файлы: автоматическое создание директорий и копирование конфигов
+- ✅ Обновлена конфигурация WezTerm для Ubuntu WSL (было Debian)
+- ✅ Добавлены `wa-ubuntu.bat` и `wa-debian.bat` для разных дистрибутивов
+- ✅ Добавлены `alacritty-desktop.bat` и `wezterm-desktop.bat`
+- ✅ Улучшена структура конфигураций: `~/.config/alacritty/` и `~/.config/wezterm/`
+- ✅ Расширенный поиск исполняемых файлов (PATH, Scoop, стандартные пути)
+- 📚 Обновлена документация с актуальными командами и путями
 
 ### v2.1 - 2025-11-10 (Windows)
 - ✅ Добавлен полный справочник команд и алиасов (USEFUL_ALIASES.md)

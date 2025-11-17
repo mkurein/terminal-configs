@@ -1,23 +1,29 @@
 # 🪟 Windows + WSL Terminal Configuration
 
-> **Статус**: Готово ✅ | Конфигурационные файлы ✅ | Документация ✅
+> **Статус**: Готово ✅ | Конфигурационные файлы ✅ | Документация ✅ | Автоустановка ✅
 
-Конфигурация терминала для **Windows 11 + WSL (Debian / Ubuntu)** с **Alacritty / WezTerm + Zellij + LazyVim**.
+Конфигурация терминала для **Windows 11 + WSL Ubuntu** с **Alacritty / WezTerm + Zellij + LazyVim**.
 
-> 💡 **Поддержка нескольких терминалов**: Alacritty (минималистичный, быстрый) или WezTerm (с Kitty graphics)  
-> 💡 **Поддержка нескольких дистрибутивов WSL**: Debian и Ubuntu!
+> 💡 **Поддержка двух терминалов**: Alacritty (минималистичный, быстрый) или WezTerm (GPU + Kitty graphics)  
+> 💡 **Поддержка Ubuntu и Debian WSL**  
+> 🚀 **Автоматическая установка конфигураций** при первом запуске!  
+> ⚡ **Быстрый запуск** из любой папки: команды `wa` и `ww`
+
+**Версия**: 2.2 (обновлено 2025-11-17)
 
 ## 📦 Что включено
 
 - ✅ **Alacritty** (Windows) - самый быстрый GPU-ускоренный терминал с интеграцией WSL
-- ✅ **WezTerm** (Windows) - современный терминал с Kitty graphics и inline-изображениями ⭐ NEW!
+- ✅ **WezTerm** (Windows) - современный терминал с GPU, Kitty graphics и inline-изображениями
 - ✅ **Zellij** (WSL) - terminal multiplexer с персистентностью
 - ✅ **LazyVim** (WSL) - готовая сборка Neovim с плагинами
-- ✅ **PowerShell aliases** - алиасы для PowerShell (gs, gq, gb и др.) ⭐ NEW!
+- ✅ **PowerShell aliases** - алиасы для PowerShell (gs, gq, gb и др.)
 - ✅ **Workspace layouts** - готовые конфигурации (40/60 и 50/50)
 - ✅ **Автозапуск** - Zellij запускается автоматически
 - ✅ **Интерактивное меню** - выбор layout при запуске
 - ✅ **Alt+стрелки** - навигация между панелями Zellij
+- 🚀 **Автоустановка конфигов** - bat-файлы автоматически копируют конфигурации при первом запуске
+- ⚡ **Быстрый запуск** - команды `wa` и `ww` из любой папки проводника
 
 ## 🚀 Быстрая установка
 
@@ -49,94 +55,102 @@ chmod +x install.sh
 ./install.sh
 ```
 
-### 3. Установите Alacritty в Windows
+### 3. Установите терминал в Windows
 
-**Вариант 1: Scoop**
+**Вариант A: Alacritty** (рекомендуется для скорости)
+
 ```powershell
+# Scoop (рекомендуется)
 scoop install alacritty
-```
 
-**Вариант 2: Chocolatey**
-```powershell
+# Или Chocolatey
 choco install alacritty
+
+# Или winget
+winget install Alacritty.Alacritty
 ```
 
-**Вариант 3:** [Скачайте с GitHub](https://github.com/alacritty/alacritty/releases)
-
-### 4. Скопируйте конфиг Alacritty в Windows
+**Вариант B: WezTerm** (рекомендуется для rich-контента)
 
 ```powershell
-# В PowerShell
-Copy-Item windows\alacritty\alacritty.toml $env:APPDATA\alacritty\
+# Scoop (рекомендуется)
+scoop install wezterm
+
+# Или Chocolatey
+choco install wezterm
+
+# Или winget
+winget install wez.wezterm
 ```
 
-### 5. Выберите дистрибутив WSL (опционально)
+### 4. Конфигурация установится автоматически! 🎉
 
-Проект предоставляет 3 конфигурации Alacritty:
+**Конфигурации копируются автоматически** при первом запуске bat-файлов:
+- `wa.bat`, `wa-ubuntu.bat`, `wa-debian.bat` → копируют конфиги Alacritty
+- `ww.bat`, `wezterm-desktop.bat` → копируют конфиги WezTerm
 
-#### 🎯 Вариант 1: Использовать дефолтный WSL (Рекомендуется)
+**Или скопируйте вручную:**
 
-Используйте основной `alacritty.toml` - он автоматически запускает ваш дефолтный WSL дистрибутив.
-
-**Смена дефолтного дистрибутива:**
 ```powershell
-# Показать все установленные дистрибутивы
+# Для Alacritty
+Copy-Item windows\alacritty\*.toml $env:USERPROFILE\.config\alacritty\
+
+# Для WezTerm
+Copy-Item windows\wezterm\wezterm.lua $env:USERPROFILE\.config\wezterm\
+```
+
+### 5. Установите быстрые команды (опционально)
+
+Установите команды `wa` и `ww` для запуска терминала из любой папки:
+
+```powershell
+# PowerShell от администратора
+# Для Alacritty
+Copy-Item windows\wa.bat C:\Windows\System32\
+
+# Для WezTerm  
+Copy-Item windows\ww.bat C:\Windows\System32\
+```
+
+**Теперь можно запускать терминал из проводника:**
+1. Откройте любую папку в проводнике
+2. Кликните в адресную строку
+3. Введите `wa` (Alacritty) или `ww` (WezTerm)
+4. Нажмите Enter
+5. Терминал откроется в этой папке в WSL! 🚀
+
+📖 **Подробные инструкции:**
+- Alacritty: [INSTALL_WA.md](./INSTALL_WA.md)
+- WezTerm: [INSTALL_WW.md](./INSTALL_WW.md)
+
+### 6. Выберите дистрибутив WSL (если нужно)
+
+**По умолчанию используется Ubuntu WSL.** Если у вас Debian или оба дистрибутива:
+
+```powershell
+# Проверить установленные дистрибутивы
 wsl --list --verbose
 
-# Установить Ubuntu как дефолтный
+# Установить дефолтный (если нужно)
 wsl --set-default Ubuntu
-
-# Или Debian
+# или
 wsl --set-default Debian
 ```
 
-#### 🎯 Вариант 2: Использовать конкретный дистрибутив
-
-Если у вас установлены оба дистрибутива и вы хотите запускать конкретный:
-
-**Для Debian:**
-```powershell
-# Скопируйте нужный конфиг
-copy alacritty-debian.toml %USERPROFILE%\.config\alacritty\
-
-# Запуск через bat-файл
-wa-debian.bat
-
-# Или напрямую
-alacritty --config-file alacritty-debian.toml
-```
-
-**Для Ubuntu:**
-```powershell
-# Скопируйте нужный конфиг
-copy alacritty-ubuntu.toml %USERPROFILE%\.config\alacritty\
-
-# Запуск через bat-файл
-wa-ubuntu.bat
-
-# Или напрямую
-alacritty --config-file alacritty-ubuntu.toml
-```
-
-#### 📂 Файлы конфигурации:
-
-| Файл | Дистрибутив | Описание |
-|------|-------------|----------|
-| `alacritty.toml` | Дефолтный WSL | Использует `wsl --set-default` |
-| `alacritty-debian.toml` | Debian | Явно указан `-d Debian` |
-| `alacritty-ubuntu.toml` | Ubuntu | Явно указан `-d Ubuntu` |
-
-#### 🚀 Bat-файлы для быстрого запуска:
+#### 📂 Bat-файлы для разных дистрибутивов:
 
 | Файл | Запускает | Использование |
 |------|-----------|---------------|
-| `wa.bat` | Дефолтный WSL | Основной запуск |
-| `wa-debian.bat` | Debian | Запуск с Debian |
-| `wa-ubuntu.bat` | Ubuntu | Запуск с Ubuntu |
+| `wa.bat` | Основной запуск | Из любой папки |
+| `wa-ubuntu.bat` | WSL Ubuntu + Zellij | Явно указан Ubuntu |
+| `wa-debian.bat` | WSL Debian + Zellij | Явно указан Debian |
+| `ww.bat` | WezTerm (Ubuntu) | Из любой папки |
+| `alacritty-desktop.bat` | Alacritty | Ярлык на рабочем столе |
+| `wezterm-desktop.bat` | WezTerm | Ярлык на рабочем столе |
 
-### 6. Перезапустите Alacritty
+### 7. Запустите терминал
 
-Откройте Alacritty → появится меню выбора workspace! 🎉
+Откройте Alacritty или WezTerm → появится меню выбора workspace! 🎉
 
 ---
 
@@ -151,8 +165,11 @@ alacritty --config-file alacritty-ubuntu.toml
 
 | Источник | Назначение (Windows) | Описание |
 |----------|----------------------|----------|
-| `alacritty/alacritty.toml` | `%APPDATA%\alacritty\alacritty.toml` | Конфигурация Alacritty |
-| `wa.bat` | `C:\Windows\` или в PATH | Запуск Alacritty из текущей папки |
+| `alacritty/*.toml` | `%USERPROFILE%\.config\alacritty\` | Конфигурации Alacritty (3 файла) |
+| `wezterm/wezterm.lua` | `%USERPROFILE%\.config\wezterm\` | Конфигурация WezTerm |
+| `wa.bat` | `C:\Windows\System32\` (опционально) | Команда запуска Alacritty |
+| `ww.bat` | `C:\Windows\System32\` (опционально) | Команда запуска WezTerm |
+| `powershell/Microsoft.PowerShell_profile.ps1` | `$PROFILE` | Профиль PowerShell с алиасами |
 
 ---
 
@@ -224,47 +241,48 @@ alacritty --config-file alacritty-ubuntu.toml
 
 ## 🚀 Быстрый запуск из проводника Windows
 
-### Открытие терминала в текущей папке
+### Способы запуска терминала
 
-Доступны скрипты для запуска терминалов прямо из проводника Windows.
+#### 🎯 Способ 1: Команды `wa` и `ww` (Рекомендуется)
 
-#### Alacritty (`wa.bat`)
+После установки в System32 (см. шаг 5), можно запускать терминал из любой папки:
 
-Файл `wa.bat` позволяет открыть Alacritty прямо из проводника Windows в текущей папке.
-
-#### WezTerm (`ww.bat`) ⭐ NEW!
-
-Файл `ww.bat` позволяет открыть WezTerm в текущей папке с поддержкой inline-изображений.
-
-**Использование:**
-- В адресной строке проводника введите `ww` и нажмите Enter
-- WezTerm откроется в WSL в этой папке!
-
-📖 **Подробная инструкция:**
-- Alacritty: [INSTALL_WA.md](./INSTALL_WA.md)
-- WezTerm: [INSTALL_WW.md](./INSTALL_WW.md)
-
-#### Запуск из папки проекта (Desktop shortcut) ⭐ NEW!
-
-Файлы для создания ярлыков на рабочем столе или в папках проектов:
-- `alacritty-desktop.bat` — двойной клик открывает Alacritty в текущей папке WSL
-- `wezterm-desktop.bat` — двойной клик открывает WezTerm в текущей папке WSL
-- Просто скопируйте нужный файл в папку проекта или на рабочий стол и запускайте!
-
-**Что делает скрипт:**
-1. Получает текущий путь Windows
-2. Конвертирует его в WSL путь
-3. Открывает терминал с переходом в эту папку в WSL
-
-### Способы использования:
-
-#### Вариант 1: Через адресную строку проводника
-1. Откройте нужную папку в проводнике Windows
+**Alacritty (`wa`):**
+1. Откройте любую папку в проводнике
 2. Кликните в адресную строку
 3. Введите `wa` и нажмите Enter
-4. Alacritty откроется в этой папке в WSL! 🎉
+4. Alacritty откроется в этой папке в WSL! 🚀
 
-#### Вариант 2: Добавить в контекстное меню
+**WezTerm (`ww`):**
+1. Откройте любую папку в проводнике
+2. Кликните в адресную строку
+3. Введите `ww` и нажмите Enter
+4. WezTerm откроется в этой папке в WSL! 🚀
+
+📖 **Подробные инструкции:**
+- [INSTALL_WA.md](./INSTALL_WA.md) - установка команды `wa`
+- [INSTALL_WW.md](./INSTALL_WW.md) - установка команды `ww`
+
+#### 🎯 Способ 2: Desktop shortcuts
+
+Файлы для создания ярлыков на рабочем столе или в папках проектов:
+- `alacritty-desktop.bat` — двойной клик открывает Alacritty в папке bat-файла
+- `wezterm-desktop.bat` — двойной клик открывает WezTerm в папке bat-файла
+
+**Использование:**
+1. Скопируйте нужный bat-файл в папку проекта или на рабочий стол
+2. Двойной клик → терминал откроется в этой папке в WSL!
+
+**Особенности:**
+- ✅ Автоматическое создание директории конфигурации
+- ✅ Автоматическое копирование конфигов при первом запуске
+- ✅ Поиск терминала в нескольких местах (PATH, Scoop, стандартные пути)
+- ✅ Конвертация Windows путей в WSL пути
+- ✅ Запуск zsh с правильными параметрами
+
+#### 🎯 Способ 3: Контекстное меню (правый клик)
+
+##### Для Alacritty:
 
 **Создайте файл `alacritty-here.reg`:**
 
@@ -280,28 +298,34 @@ Windows Registry Editor Version 5.00
 ```
 
 **Установка:**
-1. Отредактируйте путь к `wa.bat` в файле `.reg`
+1. Отредактируйте путь к `wa.bat` в файле `alacritty-here.reg`
 2. Двойной клик на `alacritty-here.reg`
 3. Подтвердите добавление в реестр
 4. Теперь ПКМ в папке → "Open Alacritty Here" ✨
 
-#### Вариант 3: Добавить wa.bat в System32 (Рекомендуется)
+##### Для WezTerm:
 
-**Установка:**
+Аналогично создайте `wezterm-here.reg` или используйте готовый файл из репозитория.
 
-```powershell
-# Откройте PowerShell от администратора и выполните:
-Copy-Item windows\wa.bat C:\Windows\System32\
-```
+### 🔧 Что происходит "под капотом"
 
-**Теперь команда `wa` работает в любой папке:**
-1. Откройте проводник
-2. Перейдите в любую папку
-3. Кликните в адресную строку
-4. Введите `wa` → Enter
-5. Alacritty откроется в этой папке в WSL! 🚀
+Все bat-файлы теперь **умные** и делают следующее:
 
-**Альтернатива:** Добавьте папку с `wa.bat` в PATH через System Environment Variables
+1. **Автоматически создают** директории конфигурации:
+   - `%USERPROFILE%\.config\alacritty\`
+   - `%USERPROFILE%\.config\wezterm\`
+
+2. **Автоматически копируют** конфигурационные файлы при первом запуске
+
+3. **Ищут исполняемый файл** в нескольких местах:
+   - PATH (команда `where`)
+   - Scoop (`%USERPROFILE%\.local\bin\`)
+   - Стандартная установка (`C:\Program Files\`)
+   - Local AppData (`%LOCALAPPDATA%\Programs\`)
+
+4. **Конвертируют пути** Windows → WSL (`C:\Project\` → `/mnt/c/Project/`)
+
+5. **Запускают zsh** с правильными параметрами для WSL
 
 ---
 
@@ -511,9 +535,42 @@ Copy-Item terminal-configs\windows\alacritty\alacritty.toml $env:APPDATA\alacrit
 
 ---
 
-**Версия**: 2.1 (полная конфигурация + WezTerm + PowerShell aliases)
-**Дата**: 2025-01-XX
-**Платформа**: Windows 11 + WSL (Debian / Ubuntu)
+---
+
+## 📝 Changelog
+
+### v2.2 - 2025-11-17
+- 🚀 **Автоматическая установка конфигураций** при первом запуске bat-файлов
+- ✅ Исправлен `ww.bat` - теперь корректно запускается в WSL с zsh
+- ✅ Улучшены все bat-файлы: автоматическое создание директорий и копирование конфигов
+- ✅ Обновлена конфигурация WezTerm для Ubuntu WSL (было Debian)
+- ✅ Добавлены `wa-ubuntu.bat` и `wa-debian.bat` для разных дистрибутивов
+- ✅ Добавлены `alacritty-desktop.bat` и `wezterm-desktop.bat`
+- ✅ Улучшена структура конфигураций: `~/.config/alacritty/` и `~/.config/wezterm/`
+- ✅ Расширенный поиск исполняемых файлов (PATH, Scoop, стандартные пути)
+- 📚 Обновлена документация с актуальными командами и путями
+
+### v2.1 - 2025-11-10
+- ✅ Добавлен WezTerm с GPU-ускорением и Kitty graphics
+- ✅ Добавлены PowerShell aliases (профиль PowerShell)
+- ✅ Полный справочник команд и алиасов (USEFUL_ALIASES.md)
+- ✅ Документация по WezTerm (WEZTERM_SETUP.md)
+- ✅ Productivity Tools - 9 скриптов + 32+ алиасов
+- ✅ Поддержка Ubuntu и Debian WSL дистрибутивов
+
+### v2.0 - 2025-11-09
+- ✅ Сохранены все конфигурационные файлы с рабочей машины
+- ✅ Alacritty (Windows) + Zellij (WSL) + LazyVim интеграция
+- ✅ Готовые workspace layouts (40/60 и 50/50)
+- ✅ Скрипт установки для WSL (install.sh)
+- ✅ Alt+стрелки для навигации в Zellij
+- ✅ Полная документация и примеры
+
+---
+
+**Версия**: 2.2 (автоустановка + улучшенные bat-файлы)  
+**Дата**: 2025-11-17  
+**Платформа**: Windows 11 + WSL Ubuntu (также поддерживается Debian)  
 **Компоненты**: Alacritty, WezTerm, Zellij, LazyVim, Zsh, PowerShell
 
 **См. также:** [macOS конфигурация](../macos/) - аналогичная структура для macOS

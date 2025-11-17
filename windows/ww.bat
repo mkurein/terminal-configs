@@ -32,29 +32,51 @@ REM     - ww
 REM 
 REM ТРЕБОВАНИЯ:
 REM   - Windows 11 или Windows 10 с WSL2
-REM   - WezTerm установлен в "C:\Users\%USERNAME%\.local\bin\" (Scoop)
-REM     или в "C:\Program Files\WezTerm\"
-REM   - WSL с Debian или Ubuntu настроен
+REM   - WezTerm установлен (Scoop, winget, или вручную)
+REM   - WSL с zsh настроен
 REM 
 REM ============================================================================
 
-REM Конвертировать текущий путь в WSL формат
-for /f "delims=" %%i in ('wsl wslpath -u "%cd%"') do set WSLPATH=%%i
+setlocal
 
-REM Попробовать найти WezTerm (Scoop устанавливает в .local\bin)
-if exist "%USERPROFILE%\.local\bin\wezterm-gui.exe" (
-    start "" "%USERPROFILE%\.local\bin\wezterm-gui.exe" start -- wsl.exe bash -c "cd '%WSLPATH%' && exec zsh"
-) else if exist "C:\Program Files\WezTerm\wezterm-gui.exe" (
-    start "" "C:\Program Files\WezTerm\wezterm-gui.exe" start -- wsl.exe bash -c "cd '%WSLPATH%' && exec zsh"
-) else (
-    echo [ERROR] WezTerm не найден!
-    echo.
-    echo Установите WezTerm:
-    echo   scoop install wezterm
-    echo   choco install wezterm
-    echo   winget install wez.wezterm
-    echo.
-    echo Или укажите правильный путь в ww.bat
-    pause
+for /f "delims=" %%i in ('wsl wslpath -u "%cd%"') do set "WSLPATH=%%i"
+
+rem Попробовать найти WezTerm через where (поиск в PATH)
+where wezterm.exe >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    start "" wezterm.exe start -- wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && exec zsh"
+    goto :end
 )
+
+rem Попробовать стандартные пути установки
+if exist "%USERPROFILE%\.local\bin\wezterm.exe" (
+    start "" "%USERPROFILE%\.local\bin\wezterm.exe" start -- wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && exec zsh"
+    goto :end
+)
+
+if exist "C:\Program Files\WezTerm\wezterm.exe" (
+    start "" "C:\Program Files\WezTerm\wezterm.exe" start -- wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && exec zsh"
+    goto :end
+)
+
+if exist "%LOCALAPPDATA%\Programs\WezTerm\wezterm.exe" (
+    start "" "%LOCALAPPDATA%\Programs\WezTerm\wezterm.exe" start -- wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && exec zsh"
+    goto :end
+)
+
+rem WezTerm не найден
+echo [ERROR] WezTerm не найден!
+echo.
+echo Установите WezTerm одним из способов:
+echo   scoop install wezterm
+echo   choco install wezterm
+echo   winget install wez.wezterm
+echo.
+echo Или скачайте с: https://wezfurlong.org/wezterm/install/windows.html
+echo.
+pause
+exit /b 1
+
+:end
+endlocal
 

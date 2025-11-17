@@ -37,5 +37,11 @@ REM   - WSL с zsh настроен
 REM 
 REM ============================================================================
 
-for /f "delims=" %%i in ('wsl wslpath -u "%cd%"') do set WSLPATH=%%i
-start "" "C:\Program Files\Alacritty\alacritty.exe" -e wsl.exe bash -c "cd '%WSLPATH%' && exec zsh"
+setlocal
+
+for /f "delims=" %%i in ('wsl wslpath -u "%cd%"') do set "WSLPATH=%%i"
+
+rem Запуск Alacritty и сразу Zellij с выбором layout
+start "" "C:\Program Files\Alacritty\alacritty.exe" -e wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && ~/start-zellij-choose.sh"
+
+endlocal

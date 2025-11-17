@@ -5,14 +5,14 @@ local wezterm = require 'wezterm'
 
 return {
   -- ===== WSL INTEGRATION =====
-  -- Запуск Debian WSL по умолчанию
-  default_prog = { "wsl.exe", "-d", "Debian", "--cd", "~" },
+  -- Запуск Ubuntu WSL по умолчанию
+  default_prog = { "wsl.exe", "-d", "Ubuntu", "--cd", "~" },
   
-  -- Для Ubuntu используйте:
-  -- default_prog = { "wsl.exe", "-d", "Ubuntu", "--cd", "~" },
+  -- Для Debian используйте:
+  -- default_prog = { "wsl.exe", "-d", "Debian", "--cd", "~" },
   
   -- Для запуска Zellij при старте добавьте:
-  -- default_prog = { "wsl.exe", "-d", "Debian", "--cd", "~", "--exec", "/usr/bin/zsh", "-l", "-c", "~/start-zellij-choose.sh" },
+  -- default_prog = { "wsl.exe", "-d", "Ubuntu", "--cd", "~", "--exec", "/usr/bin/zsh", "-l", "-c", "~/start-zellij-choose.sh" },
 
   -- ===== ШРИФТЫ =====
   font = wezterm.font_with_fallback({
