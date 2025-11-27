@@ -1,47 +1,50 @@
 @echo off
+setlocal EnableDelayedExpansion
 REM ============================================================================
 REM  wa.bat - Быстрый запуск Alacritty в текущей папке Windows + WSL
 REM ============================================================================
 REM 
 REM ОПИСАНИЕ:
 REM   Открывает Alacritty в текущей папке проводника с автоматическим
-REM   переходом в WSL и запуском zsh
+REM   переходом в WSL и запуском zsh + Zellij c LazyVim layout-меню
 REM 
 REM УСТАНОВКА:
-REM   1. Скопируйте этот файл в C:\Windows\System32\
-REM      (Требуются права администратора)
-REM   
-REM   PowerShell команда (от администратора):
-REM   Copy-Item wa.bat C:\Windows\System32\
-REM 
-REM ИСПОЛЬЗОВАНИЕ:
-REM   Вариант 1: Через адресную строку проводника
-REM     - Откройте любую папку в проводнике
-REM     - Кликните в адресную строку
-REM     - Введите: wa
-REM     - Нажмите Enter
-REM     - Alacritty откроется в этой папке в WSL!
-REM 
-REM   Вариант 2: Через контекстное меню
-REM     - Используйте alacritty-here.reg для добавления в меню
-REM     - ПКМ на фоне папки → "Open Alacritty Here"
-REM 
-REM   Вариант 3: Из командной строки
-REM     - cd C:\Your\Project\Folder
-REM     - wa
-REM 
-REM ТРЕБОВАНИЯ:
-REM   - Windows 11 или Windows 10 с WSL2
-REM   - Alacritty установлен в "C:\Program Files\Alacritty\"
-REM   - WSL с zsh настроен
+REM   1. Скопируйте этот файл в C:\Windows\System32\  (нужен админ)
+REM   2. Убедитесь, что папка windows\alacritty\ находится рядом с bat-файлом
 REM 
 REM ============================================================================
 
-setlocal
+set "CONFIG_DIR=%USERPROFILE%\.config\alacritty"
+set "SOURCE_DIR=%~dp0alacritty"
+
+if not exist "%CONFIG_DIR%" (
+    echo Создание директории конфигураций: %CONFIG_DIR%
+    mkdir "%CONFIG_DIR%"
+)
+
+if exist "%SOURCE_DIR%" (
+    for %%F in (alacritty.toml alacritty-ubuntu.toml alacritty-debian.toml) do (
+        if exist "%SOURCE_DIR%\%%F" if not exist "%CONFIG_DIR%\%%F" (
+            echo Копирование %%F в %CONFIG_DIR%...
+            copy "%SOURCE_DIR%\%%F" "%CONFIG_DIR%\%%F" >nul
+        )
+    )
+)
 
 for /f "delims=" %%i in ('wsl wslpath -u "%cd%"') do set "WSLPATH=%%i"
 
-rem Запуск Alacritty и сразу Zellij с выбором layout
-start "" "C:\Program Files\Alacritty\alacritty.exe" -e wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && ~/start-zellij-choose.sh"
+set "ALACRITTY_EXE="
+for /f "delims=" %%i in ('where alacritty.exe 2^>nul') do if not defined ALACRITTY_EXE set "ALACRITTY_EXE=%%i"
+
+if not defined ALACRITTY_EXE if exist "C:\Program Files\Alacritty\alacritty.exe" set "ALACRITTY_EXE=C:\Program Files\Alacritty\alacritty.exe"
+if not defined ALACRITTY_EXE if exist "%LOCALAPPDATA%\Programs\Alacritty\alacritty.exe" set "ALACRITTY_EXE=%LOCALAPPDATA%\Programs\Alacritty\alacritty.exe"
+if not defined ALACRITTY_EXE if exist "%USERPROFILE%\.local\bin\alacritty.exe" set "ALACRITTY_EXE=%USERPROFILE%\.local\bin\alacritty.exe"
+
+if not defined ALACRITTY_EXE (
+    echo [ERROR] Alacritty не найден. Установите его через scoop/choco/winget.
+    exit /b 1
+)
+
+start "" "%ALACRITTY_EXE%" -e wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && ~/start-zellij-choose.sh"
 
 endlocal

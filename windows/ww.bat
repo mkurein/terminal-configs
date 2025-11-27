@@ -1,82 +1,94 @@
 @echo off
+setlocal EnableDelayedExpansion
 REM ============================================================================
 REM  ww.bat - Быстрый запуск WezTerm в текущей папке Windows + WSL
 REM ============================================================================
-REM 
-REM ОПИСАНИЕ:
-REM   Открывает WezTerm в текущей папке проводника с автоматическим
-REM   переходом в WSL и запуском zsh
-REM 
-REM УСТАНОВКА:
-REM   1. Скопируйте этот файл в C:\Windows\System32\
-REM      (Требуются права администратора)
-REM   
-REM   PowerShell команда (от администратора):
-REM   Copy-Item ww.bat C:\Windows\System32\
-REM 
-REM ИСПОЛЬЗОВАНИЕ:
-REM   Вариант 1: Через адресную строку проводника
-REM     - Откройте любую папку в проводнике
-REM     - Кликните в адресную строку
-REM     - Введите: ww
-REM     - Нажмите Enter
-REM     - WezTerm откроется в этой папке в WSL!
-REM 
-REM   Вариант 2: Через контекстное меню
-REM     - Используйте wezterm-here.reg для добавления в меню
-REM     - ПКМ на фоне папки → "Open WezTerm Here"
-REM 
-REM   Вариант 3: Из командной строки
-REM     - cd C:\Your\Project\Folder
-REM     - ww
-REM 
-REM ТРЕБОВАНИЯ:
-REM   - Windows 11 или Windows 10 с WSL2
-REM   - WezTerm установлен (Scoop, winget, или вручную)
-REM   - WSL с zsh настроен
-REM 
-REM ============================================================================
 
-setlocal
+set "CONFIG_DIR=%USERPROFILE%\.config\wezterm"
+set "CONFIG_FILE=%CONFIG_DIR%\wezterm.lua"
+set "SOURCE_CONFIG=%~dp0wezterm\wezterm.lua"
+set "WINPATH=%cd%"
 
-for /f "delims=" %%i in ('wsl wslpath -u "%cd%"') do set "WSLPATH=%%i"
-
-rem Попробовать найти WezTerm через where (поиск в PATH)
-where wezterm.exe >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
-    start "" wezterm.exe start -- wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && exec zsh"
-    goto :end
+if not exist "%CONFIG_DIR%" (
+    echo Creating config directory: %CONFIG_DIR%
+    mkdir "%CONFIG_DIR%"
 )
 
-rem Попробовать стандартные пути установки
-if exist "%USERPROFILE%\.local\bin\wezterm.exe" (
-    start "" "%USERPROFILE%\.local\bin\wezterm.exe" start -- wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && exec zsh"
-    goto :end
+if not exist "%CONFIG_FILE%" if exist "%SOURCE_CONFIG%" (
+    echo Copying WezTerm config to %CONFIG_DIR%...
+    copy "%SOURCE_CONFIG%" "%CONFIG_FILE%" >nul
 )
 
-if exist "C:\Program Files\WezTerm\wezterm.exe" (
-    start "" "C:\Program Files\WezTerm\wezterm.exe" start -- wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && exec zsh"
-    goto :end
+REM Convert Windows path to WSL path (C:\foo\bar -> /mnt/c/foo/bar)
+set "DRIVE=%WINPATH:~0,1%"
+set "REST=%WINPATH:~2%"
+set "REST=%REST:\=/%"
+
+REM Convert drive letter to lowercase
+call :toLower DRIVE
+
+set "WSLPATH=/mnt/%DRIVE%%REST%"
+
+REM Find WezTerm executable
+set "WEZTERM_EXE="
+for /f "delims=" %%i in ('where wezterm.exe 2^>nul') do if not defined WEZTERM_EXE set "WEZTERM_EXE=%%i"
+
+if not defined WEZTERM_EXE (
+    for /f "delims=" %%i in ('where wezterm-gui.exe 2^>nul') do if not defined WEZTERM_EXE set "WEZTERM_EXE=%%i"
 )
 
-if exist "%LOCALAPPDATA%\Programs\WezTerm\wezterm.exe" (
-    start "" "%LOCALAPPDATA%\Programs\WezTerm\wezterm.exe" start -- wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && exec zsh"
-    goto :end
+if not defined WEZTERM_EXE if exist "%USERPROFILE%\scoop\apps\wezterm\current\wezterm.exe" set "WEZTERM_EXE=%USERPROFILE%\scoop\apps\wezterm\current\wezterm.exe"
+if not defined WEZTERM_EXE if exist "%USERPROFILE%\scoop\apps\wezterm\current\wezterm-gui.exe" set "WEZTERM_EXE=%USERPROFILE%\scoop\apps\wezterm\current\wezterm-gui.exe"
+if not defined WEZTERM_EXE if exist "%USERPROFILE%\.local\bin\wezterm.exe" set "WEZTERM_EXE=%USERPROFILE%\.local\bin\wezterm.exe"
+if not defined WEZTERM_EXE if exist "%USERPROFILE%\.local\bin\wezterm-gui.exe" set "WEZTERM_EXE=%USERPROFILE%\.local\bin\wezterm-gui.exe"
+if not defined WEZTERM_EXE if exist "C:\Program Files\WezTerm\wezterm.exe" set "WEZTERM_EXE=C:\Program Files\WezTerm\wezterm.exe"
+if not defined WEZTERM_EXE if exist "C:\Program Files\WezTerm\wezterm-gui.exe" set "WEZTERM_EXE=C:\Program Files\WezTerm\wezterm-gui.exe"
+if not defined WEZTERM_EXE if exist "%LOCALAPPDATA%\Programs\WezTerm\wezterm.exe" set "WEZTERM_EXE=%LOCALAPPDATA%\Programs\WezTerm\wezterm.exe"
+if not defined WEZTERM_EXE if exist "%LOCALAPPDATA%\Programs\WezTerm\wezterm-gui.exe" set "WEZTERM_EXE=%LOCALAPPDATA%\Programs\WezTerm\wezterm-gui.exe"
+
+if not defined WEZTERM_EXE (
+    echo [ERROR] WezTerm not found!
+    echo Install it via scoop/choco/winget and try again.
+    pause
+    exit /b 1
 )
 
-rem WezTerm не найден
-echo [ERROR] WezTerm не найден!
-echo.
-echo Установите WezTerm одним из способов:
-echo   scoop install wezterm
-echo   choco install wezterm
-echo   winget install wez.wezterm
-echo.
-echo Или скачайте с: https://wezfurlong.org/wezterm/install/windows.html
-echo.
-pause
-exit /b 1
+start "" "%WEZTERM_EXE%" start -- wsl.exe /usr/bin/zsh -l -c "cd '%WSLPATH%' && exec zsh"
 
-:end
 endlocal
+goto :eof
 
+:toLower
+REM Convert variable to lowercase
+set "_val=!%1!"
+for %%a in (A B C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
+    set "_val=!_val:%%a=%%a!"
+)
+set "_val=!_val:A=a!"
+set "_val=!_val:B=b!"
+set "_val=!_val:C=c!"
+set "_val=!_val:D=d!"
+set "_val=!_val:E=e!"
+set "_val=!_val:F=f!"
+set "_val=!_val:G=g!"
+set "_val=!_val:H=h!"
+set "_val=!_val:I=i!"
+set "_val=!_val:J=j!"
+set "_val=!_val:K=k!"
+set "_val=!_val:L=l!"
+set "_val=!_val:M=m!"
+set "_val=!_val:N=n!"
+set "_val=!_val:O=o!"
+set "_val=!_val:P=p!"
+set "_val=!_val:Q=q!"
+set "_val=!_val:R=r!"
+set "_val=!_val:S=s!"
+set "_val=!_val:T=t!"
+set "_val=!_val:U=u!"
+set "_val=!_val:V=v!"
+set "_val=!_val:W=w!"
+set "_val=!_val:X=x!"
+set "_val=!_val:Y=y!"
+set "_val=!_val:Z=z!"
+set "%1=!_val!"
+goto :eof

@@ -23,7 +23,7 @@ layout {
                 pane size="70%" {
                     cwd "/mnt/c/Project/ProjectSnabjenie"
                     command "zsh"
-                    args "-i" "-c" "n ."
+                    args "-i" "-c" "nvim ."
                 }
                 pane size="30%" {
                     cwd "/mnt/c/Project/ProjectSnabjenie"
