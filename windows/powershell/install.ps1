@@ -75,6 +75,7 @@ Write-Host "2. Проверьте работу алиасов:" -ForegroundColor
 Write-Host "   gs              # git status" -ForegroundColor Yellow
 Write-Host "   gq-help         # Справка по Git Quick" -ForegroundColor Yellow
 Write-Host "   github-fetch    # git fetch без прокси (шаблон github-proxy)" -ForegroundColor Yellow
+Write-Host "   github-commit   # git commit -m (только staging)" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "3. Если команды не работают, проверьте:" -ForegroundColor White
 Write-Host "   Get-ExecutionPolicy" -ForegroundColor Yellow

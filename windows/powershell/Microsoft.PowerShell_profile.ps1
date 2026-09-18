@@ -431,6 +431,7 @@ function Invoke-GitHubProxy {
 
 function github-fetch { Invoke-GitHubProxy "github-fetch.ps1" @args }
 function github-pull { Invoke-GitHubProxy "github-pull.ps1" @args }
+function github-commit { Invoke-GitHubProxy "github-commit.ps1" @args }
 function github-push { Invoke-GitHubProxy "github-push.ps1" @args }
 function github-gh { Invoke-GitHubProxy "github-gh.ps1" @args }
 
@@ -441,5 +442,5 @@ function Show-GqHelp {
 Set-Alias -Name gq-help -Value Show-GqHelp
 
 Write-Host "✅ PowerShell aliases loaded!" -ForegroundColor Green
-Write-Host "💡 Tip: github-fetch / github-pull / github-push / github-gh  |  gq-help" -ForegroundColor Cyan
+Write-Host "💡 Tip: github-fetch / github-pull / github-commit / github-push / github-gh  |  gq-help" -ForegroundColor Cyan
 

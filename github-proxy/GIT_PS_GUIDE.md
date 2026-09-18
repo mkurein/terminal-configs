@@ -36,9 +36,10 @@ export GITHUB_PROXY_HOME="$HOME/Project/terminal-configs/github-proxy"
 
 | Операция | Команда | Что внутри |
 |---|---|---|
-| `git fetch --all` без прокси | `github-fetch` | все remote (`origin` = GitHub, `forgejo` = NAS), без merge |
-| `git pull` без прокси | `github-pull` | то же + merge/rebase в текущую ветку |
-| `git push -u origin HEAD` без прокси | `github-push` | текущая ветка на все push-URL `origin` |
+| `git fetch` каждого remote | `github-fetch` | origin / forgejo; мёртвый URL пропускает |
+| `git pull` без прокси | `github-pull` | merge/rebase в текущую ветку |
+| `git commit -m` | `github-commit` | только staging; `git add` отдельно; без `--no-verify` |
+| `git push -u origin HEAD` без прокси | `github-push` | все push-URL `origin` |
 | меню `gh` CLI без прокси | `github-gh` | auth, PR, CI runs |
 
 Без профиля, из любого репо:
@@ -65,7 +66,7 @@ SSH-remote (`git@github.com:...`, Forgejo по SSH) HTTP-прокси не ис�
 
 ## Как подключить шаблон
 
-**Windows — PowerShell-профиль** (`terminal-configs/windows/powershell/Microsoft.PowerShell_profile.ps1`, ставится через `windows/powershell/install.ps1`). Функции `github-fetch` / `github-pull` / `github-push` / `github-gh` ищут `github-proxy` автоматически.
+**Windows — PowerShell-профиль** (`terminal-configs/windows/powershell/Microsoft.PowerShell_profile.ps1`, ставится через `windows/powershell/install.ps1`). Функции `github-fetch` / `github-pull` / `github-commit` / `github-push` / `github-gh` ищут `github-proxy` автоматически.
 
 Перезагрузить уже открытый терминал:
 
@@ -111,6 +112,19 @@ git -c http.proxy= -c https.proxy= pull --ff-only
 
 ---
 
+## `github-commit`
+
+`git commit -m` для **уже проиндексированных** файлов. **Не** делает `git add`, **не** пушит, **без** `--no-verify`.
+
+```powershell
+git add README.md
+github-commit "Document new Windows and macOS setup."
+```
+
+Без аргумента спросит сообщение. Пустой staging — выход с подсказкой `git add first`.
+
+---
+
 ## `github-push`
 
 Пушит текущую ветку в `origin` с `-u`. Несколько push-URL (GitHub + Forgejo) — уйдут **все**.
@@ -152,7 +166,8 @@ git -c http.proxy= -c https.proxy= push --force-with-lease
 github-fetch
 git status
 github-pull
-# ... git add, git commit ...
+git add …
+github-commit "why"
 github-push
 github-gh
 ```
@@ -193,6 +208,7 @@ macOS — те же имена команд. Для `git log` / `git diff` гл�
 |---|---|
 | `github-fetch.ps1` / `.sh` | fetch |
 | `github-pull.ps1` / `.sh` | pull |
+| `github-commit.ps1` / `.sh` | commit (только staging) |
 | `github-push.ps1` / `.sh` | push |
 | `github-gh.ps1` / `.sh` | меню gh |
 | `_lib.ps1` / `_lib.sh` | очистка env + проверка git-репо |

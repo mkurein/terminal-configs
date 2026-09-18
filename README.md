@@ -32,6 +32,7 @@
 |---|---|
 | `github-fetch` | fetch **каждого** remote этого репо (мёртвый URL пропускает) |
 | `github-pull` | `git pull` текущей ветки с tracking (`origin` = GitHub) |
+| `github-commit` | `git commit -m …` только **уже в staging** (`git add` сам не делает) |
 | `github-push` | `git push -u origin HEAD` на **все** push-URL `origin` |
 | `github-gh` | меню `gh` CLI без прокси (auth, PR, runs — будем расширять) |
 
@@ -104,7 +105,7 @@ source "$HOME/Project/terminal-configs/github-proxy/env.sh"
 4. Новый терминал или `source ~/.zshrc`.
 5. Для `github-gh` один раз: `gh auth login`.
 
-Дальше те же имена, что на Windows: `github-fetch`, `github-pull`, `github-push`, `github-gh`.
+Дальше те же имена, что на Windows: `github-fetch`, `github-pull`, `github-commit`, `github-push`, `github-gh`.
 
 #### Что не ставится само
 
@@ -152,7 +153,9 @@ origin   ssh://git@100.64.0.12:2222/mxm/terminal-configs.git (push)
 github-fetch          # GitHub + Forgejo, без слияния
 git status
 github-pull           # влить origin/текущая-ветка
-# … правки, git add, git commit …
+# … правки …
+git add path/to/file
+github-commit "краткое why"
 git branch --show-current    # не пушить main вслепую
 github-push           # GitHub и NAS одним разом
 github-gh             # PR / auth / CI, когда нужно

@@ -15,10 +15,12 @@ unset _github_proxy_dir
 
 github_fetch() { "$GITHUB_PROXY_HOME/github-fetch.sh" "$@"; }
 github_pull() { "$GITHUB_PROXY_HOME/github-pull.sh" "$@"; }
+github_commit() { "$GITHUB_PROXY_HOME/github-commit.sh" "$@"; }
 github_push() { "$GITHUB_PROXY_HOME/github-push.sh" "$@"; }
 github_gh() { "$GITHUB_PROXY_HOME/github-gh.sh" "$@"; }
 
 alias github-fetch=github_fetch
 alias github-pull=github_pull
+alias github-commit=github_commit
 alias github-push=github_push
 alias github-gh=github_gh

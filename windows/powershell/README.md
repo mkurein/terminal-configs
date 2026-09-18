@@ -92,6 +92,7 @@ gq undo             # Отменить последний коммит
 gq-help             # Показать справку
 github-fetch        # git fetch без прокси (шаблон terminal-configs/github-proxy)
 github-pull
+github-commit "msg" # git commit, только staging
 github-push
 github-gh           # меню gh CLI без прокси
 ```
