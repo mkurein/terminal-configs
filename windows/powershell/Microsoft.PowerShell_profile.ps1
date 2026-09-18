@@ -389,6 +389,45 @@ function winpath {
     }
 }
 
+# ===== GITHUB WITHOUT PROXY (shared template: terminal-configs/github-proxy) =====
+# See github-proxy/GIT_PS_GUIDE.md. Works on the current directory's git repo.
+function Get-GitHubProxyHome {
+    if ($env:GITHUB_PROXY_HOME -and (Test-Path (Join-Path $env:GITHUB_PROXY_HOME "github-fetch.ps1"))) {
+        return $env:GITHUB_PROXY_HOME
+    }
+    $candidates = @(
+        "C:\Project\terminal-configs\github-proxy",
+        (Join-Path $HOME "Project\terminal-configs\github-proxy"),
+        (Join-Path $HOME "terminal-configs\github-proxy")
+    )
+    foreach ($c in $candidates) {
+        if (Test-Path (Join-Path $c "github-fetch.ps1")) {
+            return $c
+        }
+    }
+    return $null
+}
+
+function Invoke-GitHubProxy {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Script,
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [object[]]$ScriptArgs
+    )
+    $root = Get-GitHubProxyHome
+    if (-not $root) {
+        Write-Host "github-proxy template not found. Clone terminal-configs or set GITHUB_PROXY_HOME." -ForegroundColor Red
+        return
+    }
+    & (Join-Path $root $Script) @ScriptArgs
+}
+
+function github-fetch { Invoke-GitHubProxy "github-fetch.ps1" @args }
+function github-pull { Invoke-GitHubProxy "github-pull.ps1" @args }
+function github-push { Invoke-GitHubProxy "github-push.ps1" @args }
+function github-gh { Invoke-GitHubProxy "github-gh.ps1" @args }
+
 # ===== GIT QUICK COMMANDS HELP =====
 function Show-GqHelp {
     gq menu
@@ -396,5 +435,5 @@ function Show-GqHelp {
 Set-Alias -Name gq-help -Value Show-GqHelp
 
 Write-Host "✅ PowerShell aliases loaded!" -ForegroundColor Green
-Write-Host "💡 Tip: Use 'gq-help' to see Git Quick commands" -ForegroundColor Cyan
+Write-Host "💡 Tip: github-fetch / github-pull / github-push / github-gh  |  gq-help" -ForegroundColor Cyan
 

@@ -34,6 +34,20 @@ alias pip='pip3'
 alias venv='python3 -m venv venv && source venv/bin/activate'
 alias activate='source venv/bin/activate'
 
+# ===== GITHUB WITHOUT PROXY (shared template: terminal-configs/github-proxy) =====
+# See github-proxy/GIT_PS_GUIDE.md. Override: export GITHUB_PROXY_HOME=...
+_github_proxy_env=""
+for _f in \
+  "${GITHUB_PROXY_HOME:+$GITHUB_PROXY_HOME/env.sh}" \
+  "/mnt/c/Project/terminal-configs/github-proxy/env.sh" \
+  "$HOME/Project/terminal-configs/github-proxy/env.sh" \
+  "$HOME/terminal-configs/github-proxy/env.sh"
+do
+  [ -n "$_f" ] && [ -f "$_f" ] && _github_proxy_env="$_f" && break
+done
+[ -n "$_github_proxy_env" ] && . "$_github_proxy_env"
+unset _f _github_proxy_env
+
 # ===== CUSTOM SCRIPTS =====
 alias ps='~/project-switcher.sh'
 alias gq='~/git-quick.sh'

@@ -90,6 +90,10 @@ gq acp "message"    # add + commit + push (SUPER COMMAND!)
 gq sync             # Синхронизация с main/master
 gq undo             # Отменить последний коммит
 gq-help             # Показать справку
+github-fetch        # git fetch без прокси (шаблон terminal-configs/github-proxy)
+github-pull
+github-push
+github-gh           # меню gh CLI без прокси
 ```
 
 ### Windows интеграция

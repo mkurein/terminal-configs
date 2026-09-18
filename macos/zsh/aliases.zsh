@@ -38,6 +38,20 @@ alias showfiles='defaults write com.apple.finder AppleShowAllFiles YES; killall 
 alias hidefiles='defaults write com.apple.finder AppleShowAllFiles NO; killall Finder'
 alias flushdns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
+# ===== GITHUB WITHOUT PROXY (shared template: terminal-configs/github-proxy) =====
+# See github-proxy/GIT_PS_GUIDE.md. Override: export GITHUB_PROXY_HOME=...
+_github_proxy_env=""
+for _f in \
+  "${GITHUB_PROXY_HOME:+$GITHUB_PROXY_HOME/env.sh}" \
+  "$HOME/Project/terminal-configs/github-proxy/env.sh" \
+  "$HOME/terminal-configs/github-proxy/env.sh" \
+  "$HOME/terminal-configs-backup/github-proxy/env.sh"
+do
+  [ -n "$_f" ] && [ -f "$_f" ] && _github_proxy_env="$_f" && break
+done
+[ -n "$_github_proxy_env" ] && . "$_github_proxy_env"
+unset _f _github_proxy_env
+
 # ===== CUSTOM SCRIPTS =====
 alias ps='~/project-switcher.sh'
 alias gq='~/git-quick.sh'

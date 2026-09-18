@@ -53,6 +53,14 @@
 
 ---
 
+### GitHub без прокси
+
+Общий шаблон (не копировать в каждый проект): [`github-proxy/GIT_PS_GUIDE.md`](./github-proxy/GIT_PS_GUIDE.md).
+
+После профиля: `github-fetch`, `github-pull`, `github-push`, `github-gh` из любого git-репо.
+
+---
+
 ## 🚀 Быстрый старт
 
 ### macOS
