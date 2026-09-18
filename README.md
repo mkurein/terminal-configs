@@ -24,24 +24,94 @@
 
 ### Один раз на машине
 
-PowerShell-профиль (Windows) или zsh aliases (macOS) из этого репо. Новый терминал, либо:
+Одного `git clone` **мало**. `. $PROFILE` / новый zsh подхватывают уже **установленный** профиль пользователя — clone его сам не создаёт.
 
-```powershell
-. $PROFILE
-```
-
-После этого из **любого** git-репо (не только этого):
+После установки команды работают в **любом** каталоге с `.git` (Lite, ApiHA, homelab-book, …), не только в `terminal-configs`. Они смотрят на **текущий** репо.
 
 | Команда | Что делает |
 |---|---|
-| `github-fetch` | `git fetch --all` без HTTP/SOCKS-прокси |
+| `github-fetch` | fetch **каждого** remote этого репо (мёртвый URL пропускает) |
 | `github-pull` | `git pull` текущей ветки с tracking (`origin` = GitHub) |
 | `github-push` | `git push -u origin HEAD` на **все** push-URL `origin` |
 | `github-gh` | меню `gh` CLI без прокси (auth, PR, runs — будем расширять) |
 
 Это не `gq` / `gp` / `gl`: они прокси не чистят. Для GitHub по HTTPS с живым SOCKS — только `github-*`.
 
-Remotes этого репо (если ещё старый `kureinmaxim` или нет Forgejo):
+#### Новая Windows
+
+1. Git for Windows. По желанию GitHub CLI: `winget install GitHub.cli`.
+2. Clone в одно из мест, которые профиль ищет сам:
+
+```powershell
+git clone https://github.com/mkurein/terminal-configs.git C:\Project\terminal-configs
+```
+
+Также подхватываются `~\Project\terminal-configs` и `~\terminal-configs`. Иначе в этой сессии (лучше — в профиле насовсем):
+
+```powershell
+$env:GITHUB_PROXY_HOME = "D:\где\лежит\terminal-configs\github-proxy"
+```
+
+3. Поставить PowerShell-профиль (копирует шаблон в `$PROFILE`):
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+cd C:\Project\terminal-configs\windows\powershell
+.\install.ps1
+```
+
+4. Новый терминал или `. $PROFILE`.
+5. Для `github-gh` один раз: `gh auth login` (или пункт меню).
+
+Проверка: в любом git-репо `github-fetch` печатает `Fetching origin` (и `Fetching forgejo`, если этот remote есть).
+
+Профиль не «живёт» внутри clone. Если обновился `windows/powershell/Microsoft.PowerShell_profile.ps1` — снова `.\install.ps1`.
+
+#### Новая macOS
+
+1. Git (часто уже есть; иначе `xcode-select --install`). GitHub CLI: `brew install gh`.
+2. Clone туда, откуда aliases сами берут `env.sh`:
+
+```bash
+git clone https://github.com/mkurein/terminal-configs.git ~/Project/terminal-configs
+```
+
+Также ищутся `~/terminal-configs` и `~/terminal-configs-backup`. Иначе в `~/.zshrc`:
+
+```bash
+export GITHUB_PROXY_HOME="$HOME/другой/путь/terminal-configs/github-proxy"
+```
+
+3. Поставить zsh-алиасы. Полный стек терминала:
+
+```bash
+cd ~/Project/terminal-configs/macos
+./install.sh
+```
+
+Это копирует `zsh/aliases.zsh` → `~/.config/zsh/aliases.zsh`. В `~/.zshrc` должна быть строка (если её ещё нет — добавить):
+
+```bash
+[[ -f ~/.config/zsh/aliases.zsh ]] && source ~/.config/zsh/aliases.zsh
+```
+
+Минимум без Alacritty/Zellij — только git-обёртки, в `~/.zshrc`:
+
+```bash
+source "$HOME/Project/terminal-configs/github-proxy/env.sh"
+```
+
+4. Новый терминал или `source ~/.zshrc`.
+5. Для `github-gh` один раз: `gh auth login`.
+
+Дальше те же имена, что на Windows: `github-fetch`, `github-pull`, `github-push`, `github-gh`.
+
+#### Что не ставится само
+
+- Dual GitHub+Forgejo в **другом** проекте. Свежий `git clone` с GitHub даёт только `origin`. `github-fetch` качает те remote, что уже прописаны в этом `.git`. Два push-URL — руками, как ниже.
+- `github-push` зеркалит на NAS только если у `origin` есть второй push SSH `:2222`.
+
+Remotes **этого** репо (если ещё старый `kureinmaxim` или нет Forgejo):
 
 ```powershell
 cd C:\Project\terminal-configs   # на Mac — путь к clone
@@ -88,16 +158,7 @@ github-push           # GitHub и NAS одним разом
 github-gh             # PR / auth / CI, когда нужно
 ```
 
-macOS: те же имена (`github-fetch` …). Первый clone шаблона:
-
-```bash
-git clone https://github.com/mkurein/terminal-configs.git ~/Project/terminal-configs
-cd ~/Project/terminal-configs/macos && ./install.sh
-```
-
-Windows-профиль: `windows/powershell/install.ps1`.
-
-Если Forgejo в браузере пустой — туда ещё не было `github-push` (или push шёл только на GitHub). После успешного push страница `:3000` показывает те же коммиты.
+macOS: те же имена команд. Если Forgejo в браузере пустой — туда ещё не было `github-push` (или push шёл только на GitHub). После успешного push страница `:3000` показывает те же коммиты.
 
 ### `github-gh` (заготовка)
 
