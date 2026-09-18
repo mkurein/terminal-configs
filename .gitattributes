@@ -1,0 +1,4 @@
+# Keep shell wrappers Unix-safe; this repo is public.
+github-proxy/*.sh text eol=lf
+github-proxy/*.ps1 text eol=crlf
+*.sh text eol=lf

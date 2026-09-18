@@ -91,7 +91,7 @@ brew install gh
 
 ## `github-fetch`
 
-Подтягивает с **всех** remote (`origin`, `forgejo`, …) свежие коммиты в `origin/*` / `forgejo/*`, **не сливая** с локальными. Без аргументов это `git fetch --all`. Явный remote: `github-fetch origin`.
+Подтягивает с **всех** remote (`origin`, `forgejo`, …) свежие коммиты в `origin/*` / `forgejo/*`, **не сливая** с локальными. Без аргументов — fetch **каждого** remote по очереди: мёртвый URL (`Repository not found`) пропускается с warning, остальные докачиваются. Явный remote: `github-fetch origin` (ошибка этого remote уже не глотается).
 
 Когда: посмотреть, что нового; перед checkout; две машины.
 
@@ -146,7 +146,7 @@ git -c http.proxy= -c https.proxy= push --force-with-lease
 
 ## Типичный сценарий
 
-Терминал уже стоит в корне нужного репо (Lite, ApiHA, TelegramOnly, …).
+Терминал уже стоит в корне нужного репо.
 
 ```powershell
 github-fetch
@@ -183,6 +183,7 @@ macOS — те же имена команд. Для `git log` / `git diff` гл�
 - Не добавлять `--force` в шаблон.
 - Не комбинировать с `git --no-verify`.
 - На Windows для git/GitHub канон — PowerShell + `.ps1`, не Git Bash как основной git.
+- Не писать сюда личные GitHub-логины, URL частных репо, токены и домашние имена проектов: `mkurein/terminal-configs` публичный.
 
 ---
 
