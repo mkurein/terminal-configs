@@ -38,6 +38,46 @@
 
 Это не `gq` / `gp` / `gl`: они прокси не чистят. Для GitHub по HTTPS с живым SOCKS — только `github-*`.
 
+#### Команда не распознана (`The term 'github-…' is not recognized`)
+
+Это **не PATH**. Имена живут в профиле. Открытый терминал помнит старую загрузку.
+
+**Windows — в этой же сессии:**
+
+```powershell
+. $PROFILE
+```
+
+**Что это делает.** `$PROFILE` — путь к файлу профиля этого PowerShell (не команда и не PATH). Обычно `…\Documents\PowerShell\Microsoft.PowerShell_profile.ps1` (часто под OneDrive). Точка `.` — выполнить файл **в текущей** сессии (как `source` в zsh).
+
+Профиль читается **один раз при открытии** окна. `github-fetch` / `github-commit` — функции из этого файла, их нет в PATH. После `install.ps1` или правок профиля уже открытый терминал ничего не знает, пока не сделать `. $PROFILE` (или не открыть новое окно). Команда не ставит Git, не клонирует репо и не меняет файлы на диске: только заново объявляет функции **здесь**.
+
+Проверка: `echo $PROFILE` — какой файл; после точки в Tip должны быть все имена, включая `github-commit`. Если нет — профиль на диске старый:
+
+```powershell
+cd C:\Project\terminal-configs\windows\powershell
+.\install.ps1
+. $PROFILE
+```
+
+Справка: `github-help`.
+
+Без профиля, из любого `.git`:
+
+```powershell
+& C:\Project\terminal-configs\github-proxy\github-commit.ps1 "сообщение"
+& C:\Project\terminal-configs\github-proxy\github-fetch.ps1
+```
+
+**macOS:**
+
+```bash
+source ~/.zshrc
+source "$HOME/Project/terminal-configs/github-proxy/env.sh"
+# напрямую:
+~/Project/terminal-configs/github-proxy/github-commit.sh "сообщение"
+```
+
 #### Новая Windows
 
 1. Git for Windows. По желанию GitHub CLI: `winget install GitHub.cli`.
@@ -109,10 +149,47 @@ source "$HOME/Project/terminal-configs/github-proxy/env.sh"
 
 #### Что не ставится само
 
-- Dual GitHub+Forgejo в **другом** проекте. Свежий `git clone` с GitHub даёт только `origin`. `github-fetch` качает те remote, что уже прописаны в этом `.git`. Два push-URL — руками, как ниже.
+- Dual GitHub+Forgejo в **другом** проекте. Свежий `git clone` с GitHub даёт только `origin` (один fetch и один push на GitHub). `github-fetch` качает те remote, что уже прописаны в этом `.git`. Второй push на NAS и имя `forgejo` — руками, как ниже.
 - `github-push` зеркалит на NAS только если у `origin` есть второй push SSH `:2222`.
 
-Remotes **этого** репо (если ещё старый `kureinmaxim` или нет Forgejo):
+#### Связать репо с GitHub и Forgejo
+
+Схема одна для всех проектов (Lite, ApiHA, этот репо, …):
+
+| Роль | URL | Кто пользуется |
+|---|---|---|
+| `origin` **fetch** | GitHub (HTTPS или `git@github.com:…`) | `github-pull`, tracking ветки (`origin/main`) |
+| `origin` **push** №1 | тот же GitHub | `github-push` — публичная копия |
+| `origin` **push** №2 | Forgejo SSH `:2222` | тот же `github-push` — зеркало на NAS |
+| remote `forgejo` | тот же SSH `:2222` | только чтобы `github-fetch` видел NAS; **pull сюда не ходит** |
+
+Веб Forgejo (`http://100.64.0.12:3000/…`) в remotes **не пишем**. Пустой репо на NAS сначала создай в браузере (без README), git — только `ssh://git@100.64.0.12:2222/mxm/ИМЯ.git`.
+
+**1. Посмотри, что уже есть** (не добавляй Forgejo второй раз — Git просто продублирует URL):
+
+```powershell
+cd путь\к\репо
+git remote -v
+git remote get-url origin
+git remote get-url --push --all origin
+```
+
+Без `--all` `get-url --push` показывает **только первый** push-URL (часто GitHub) и прячет NAS.
+
+**2. Свежий clone с GitHub** — fetch уже правильный. Добавь зеркало:
+
+```powershell
+# подставь свой GitHub и имя на NAS (орг Forgejo: mxm)
+$gh = "https://github.com/OWNER/REPO.git"   # или git@github.com:OWNER/REPO.git
+$fj = "ssh://git@100.64.0.12:2222/mxm/REPO.git"
+
+git remote set-url --add --push origin $fj
+git remote add forgejo $fj     # если имени forgejo ещё нет
+```
+
+Если `forgejo` уже есть: `git remote set-url forgejo $fj`.
+
+**3. С нуля / битый URL** (старый owner, HTTP `:3000`, один push не туда). Пример **этого** репо:
 
 ```powershell
 cd C:\Project\terminal-configs   # на Mac — путь к clone
@@ -124,7 +201,17 @@ git remote remove forgejo 2>$null
 git remote add forgejo ssh://git@100.64.0.12:2222/mxm/terminal-configs.git
 ```
 
-Проверка — `git remote -v` должен выглядеть так (это **правильно**):
+На macOS / zsh то же, только удаление имени: `git remote remove forgejo 2>/dev/null || true`.
+
+После настройки tracking должен смотреть на **GitHub**, не на `forgejo`:
+
+```powershell
+git branch --set-upstream-to=origin/main
+```
+
+(подставь свою ветку вместо `main`).
+
+Ожидаемый `git remote -v` **этого** репо:
 
 ```
 forgejo  ssh://git@100.64.0.12:2222/mxm/terminal-configs.git (fetch)
@@ -134,22 +221,73 @@ origin   https://github.com/mkurein/terminal-configs.git (push)
 origin   ssh://git@100.64.0.12:2222/mxm/terminal-configs.git (push)
 ```
 
-Что значит каждая строка:
-
 | Строка | Зачем |
 |---|---|
-| `origin` fetch HTTPS GitHub | `github-pull` / tracking ветки качают отсюда |
-| `origin` push HTTPS GitHub | публичная копия |
+| `origin` fetch GitHub | `github-pull` / `origin/main` качают отсюда |
+| `origin` push GitHub | публичная копия |
 | `origin` push SSH Forgejo | тот же `github-push` сразу зеркалит на NAS |
-| `forgejo` fetch+push SSH | отдельное имя, чтобы `github-fetch` (`git fetch --all`) видел NAS, а не только GitHub |
+| `forgejo` fetch+push SSH | `github-fetch` видит NAS; в `git pull` это имя не участвует |
 
-Веб `http://100.64.0.12:3000/mxm/terminal-configs` (с `.git` или без) в remotes **быть не должен**. Git — только `ssh://git@100.64.0.12:2222/mxm/terminal-configs.git`.
+У Lite / ApiHA / homelab-book имени `forgejo` может не быть: `github-fetch` тогда качает только GitHub, а `github-push` всё равно идёт в оба, если у `origin` два push-URL.
+
+#### Как проверить: откуда pull, куда push
+
+Команды ниже **ничего не отправляют**. Терминал уже в корне репо.
+
+**Откуда будет `github-pull` / `git pull`**
+
+Pull берёт **fetch-URL** remote, на который смотрит текущая ветка (обычно `origin`), не второй push-URL.
+
+```powershell
+git remote get-url origin
+git --no-pager status -sb
+git --no-pager branch -vv
+git rev-parse --abbrev-ref --symbolic-full-name "@{u}"
+```
+
+| Что увидишь | Значит |
+|---|---|
+| `get-url origin` → `github.com/…` | pull с GitHub |
+| `get-url origin` → `:3000` или только Forgejo | **неправильно** — pull не с GitHub |
+| `## main...origin/main` | tracking = `origin` (GitHub) |
+| `## main...forgejo/main` | tracking на NAS — `github-pull` пойдёт в Forgejo; верни `git branch --set-upstream-to=origin/main` |
+| `@{u}` → `origin/main` | так и должно |
+| `[behind N]` | нужно pull |
+| `[ahead N]` | нужно push |
+| `[ahead N, behind N]` | истории разошлись |
+
+**Куда будет `github-push`**
+
+Push идёт на **все** push-URL **`origin`** (имя `forgejo` при `github-push` не используется).
+
+```powershell
+git remote get-url --push --all origin
+git remote -v
+```
+
+| Что увидишь | Куда уйдёт `github-push` |
+|---|---|
+| одна строка GitHub | только GitHub, NAS не обновится |
+| GitHub **и** `ssh://git@100.64.0.12:2222/…` | GitHub + Forgejo — это цель |
+| есть `:3000` | убери, замени на SSH `:2222` |
+| две одинаковые строки Forgejo | `--add --push` запускали дважды; лишнюю убери (`git remote set-url --delete --push origin URL`) |
+
+В `git remote -v` смотри подписи `(fetch)` и `(push)` у **`origin`**: одна fetch-строка = pull, все push-строки = цели push.
+
+Живая проверка без слияния: `github-fetch` печатает `Fetching origin` (GitHub) и `Fetching forgejo` (NAS), если имя `forgejo` есть. После `github-push` в выводе Git два `To https://github.com/…` и `To ssh://…:2222/…`. Веб `:3000` обновляется только после успешного push на SSH.
 
 ### Обычный день
 
 Терминал уже в нужном проекте (`terminal-configs`, Lite, ApiHA, …).
 
+Сначала проверь, что `github-*` есть **в этой** сессии (профиль грузится один раз при открытии окна; после правок шаблона старый терминал их не видит).
+
 ```powershell
+Get-Command github-commit -ErrorAction SilentlyContinue
+# нет вывода / is not recognized → подгрузить профиль (см. выше, что делает . $PROFILE):
+. $PROFILE
+# macOS: source ~/.zshrc
+
 github-fetch          # GitHub + Forgejo, без слияния
 git status
 github-pull           # влить origin/текущая-ветка
@@ -160,6 +298,8 @@ git branch --show-current    # не пушить main вслепую
 github-push           # GitHub и NAS одним разом
 github-gh             # PR / auth / CI, когда нужно
 ```
+
+В Tip после `. $PROFILE` должны быть все имена, включая `github-commit`. Если нет — `install.ps1`, снова `. $PROFILE`. Справка: `github-help`.
 
 macOS: те же имена команд. Если Forgejo в браузере пустой — туда ещё не было `github-push` (или push шёл только на GitHub). После успешного push страница `:3000` показывает те же коммиты.
 
@@ -182,7 +322,7 @@ macOS: те же имена команд. Если Forgejo в браузере �
 
 📖 **Документация**: [ZELLIJ_SETUP_MACOS.md](./macos/docs/ZELLIJ_SETUP_MACOS.md)
 
-**Версия**: 2.1 (обновлено 2025-11-08)
+**Версия**: 2.2 (терминал, 2025-11-11); репо **2.4** — `github-proxy` (2026-09-18)
 
 **Особенности**:
 - Изолированный автозапуск Zellij только в Alacritty
@@ -204,7 +344,7 @@ macOS: те же имена команд. Если Forgejo в браузере �
 - [INSTALL_WA.md](./windows/INSTALL_WA.md) - установка команды `wa`
 - [INSTALL_WW.md](./windows/INSTALL_WW.md) - установка команды `ww`
 
-**Версия**: 2.3 (обновлено 2025-11-27)
+**Версия**: 2.3 (терминал, 2025-11-27); репо **2.4** — `github-proxy` (2026-09-18)
 
 **Особенности**:
 - 🚀 **Alacritty** и **WezTerm** в Windows с полной интеграцией WSL Ubuntu
@@ -604,6 +744,16 @@ keybinds {
 ---
 
 ## 📝 Changelog
+
+### v2.4 - 2026-09-18 (общий)
+
+- 🚀 **`github-proxy/`** — общие обёртки `github-fetch` / `github-pull` / `github-commit` / `github-push` / `github-gh` без SOCKS (PowerShell и zsh), в любом `.git`
+- ✅ Канон: публичный GitHub [`mkurein/terminal-configs`](https://github.com/mkurein/terminal-configs) + зеркало Forgejo SSH `:2222` (`origin` fetch с GitHub, push в оба)
+- ✅ README: как прописать remotes у любого репо и **проверить, откуда pull и куда push**
+- ✅ `github-fetch` идёт по каждому remote, мёртвый URL пропускает; пустой splat в PowerShell больше не схлопывается в обычный `git fetch`
+- ✅ `github-commit` — только staging, без `git add` / push / `--no-verify`
+- ✅ «is not recognized» — в каждом скрипте и README: `. $PROFILE`, иначе `install.ps1`, иначе прямой `.ps1`
+- 🔒 Обезличены домашние пути в docs, Zellij layouts и `wezterm-desktop.bat`
 
 ### v2.3 - 2025-11-27 (Windows)
 - 🚀 **Переработаны `wa.bat` и `ww.bat`** — автоустановка конфигов + поиск терминала в Scoop/PATH/стандартных путях

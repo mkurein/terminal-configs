@@ -41,6 +41,7 @@ export GITHUB_PROXY_HOME="$HOME/Project/terminal-configs/github-proxy"
 | `git commit -m` | `github-commit` | только staging; `git add` отдельно; без `--no-verify` |
 | `git push -u origin HEAD` без прокси | `github-push` | все push-URL `origin` |
 | меню `gh` CLI без прокси | `github-gh` | auth, PR, CI runs |
+| как починить «is not recognized» | `github-help` | `. $PROFILE` / install / прямой `.ps1` |
 
 Без профиля, из любого репо:
 
@@ -73,6 +74,10 @@ SSH-remote (`git@github.com:...`, Forgejo по SSH) HTTP-прокси не ис�
 ```powershell
 . $PROFILE
 ```
+
+Если `github-commit` (или другая `github-*`) «is not recognized» — это не PATH, сессия со старым профилем. Та же команда `. $PROFILE`. Tip без имени — `cd …\windows\powershell; .\install.ps1; . $PROFILE`. Напрямую: `& C:\Project\terminal-configs\github-proxy\github-commit.ps1 "msg"`. Справка: `github-help`.
+
+macOS: `source ~/.zshrc` или `source ~/Project/terminal-configs/github-proxy/env.sh`.
 
 Execution policy, если скрипты запрещены:
 
@@ -127,7 +132,7 @@ github-commit "Document new Windows and macOS setup."
 
 ## `github-push`
 
-Пушит текущую ветку в `origin` с `-u`. Несколько push-URL (GitHub + Forgejo) — уйдут **все**.
+Пушит текущую ветку в `origin` с `-u`. Несколько push-URL (GitHub + Forgejo) — уйдут **все**. Имя `forgejo` при push **не** используется.
 
 Перед запуском: `git status` и `git branch --show-current`.
 
@@ -136,6 +141,32 @@ github-commit "Document new Windows and macOS setup."
 ```powershell
 git -c http.proxy= -c https.proxy= push --force-with-lease
 ```
+
+---
+
+## Remotes: GitHub + Forgejo
+
+Полный рецепт (свежий clone, сброс битых URL, пример `terminal-configs`) — в корневом [`README.md`](../README.md) раздел **«Связать репо с GitHub и Forgejo»**.
+
+Кратко: `origin` **fetch** = GitHub; у `origin` **два push** (GitHub + `ssh://git@100.64.0.12:2222/mxm/REPO.git`); опционально remote `forgejo` с тем же SSH, чтобы `github-fetch` видел NAS. Веб `:3000` в remotes не пишем.
+
+Проверка **ничего не пушит**:
+
+```powershell
+git remote get-url origin
+git remote get-url --push --all origin
+git --no-pager status -sb
+git --no-pager branch -vv
+git rev-parse --abbrev-ref --symbolic-full-name "@{u}"
+```
+
+| Команда | Ответ, который нужен |
+|---|---|
+| `get-url origin` | GitHub → отсюда `github-pull` |
+| `get-url --push --all origin` | GitHub **и** SSH `:2222` → сюда `github-push` |
+| `status -sb` / `@{u}` | `origin/main` (не `forgejo/main`) |
+
+Без `--all` виден только первый push-URL. Tracking на NAS верни так: `git branch --set-upstream-to=origin/main`.
 
 ---
 
@@ -160,9 +191,13 @@ git -c http.proxy= -c https.proxy= push --force-with-lease
 
 ## Типичный сценарий
 
-Терминал уже стоит в корне нужного репо.
+Терминал уже стоит в корне нужного репо. Сначала проверь, что команды есть в **этой** сессии:
 
 ```powershell
+Get-Command github-commit -ErrorAction SilentlyContinue
+# пусто → . $PROFILE
+# macOS: source ~/.zshrc
+
 github-fetch
 git status
 github-pull
@@ -195,6 +230,8 @@ macOS — те же имена команд. Для `git log` / `git diff` гл�
 - Не копировать `github-*.ps1` / `github-*.sh` в каждый проект — правь только `terminal-configs/github-proxy/`.
 - Не путать с `gq` / `gp` / `gl`: они без очистки proxy.
 - Не пушить в `main`, не глядя на `git branch --show-current`.
+- Не писать в remotes веб Forgejo `:3000`; git только SSH `:2222`.
+- Не запускать `git remote set-url --add --push` повторно — появится второй одинаковый Forgejo URL.
 - Не добавлять `--force` в шаблон.
 - Не комбинировать с `git --no-verify`.
 - На Windows для git/GitHub канон — PowerShell + `.ps1`, не Git Bash как основной git.
@@ -212,4 +249,4 @@ macOS — те же имена команд. Для `git log` / `git diff` гл�
 | `github-push.ps1` / `.sh` | push |
 | `github-gh.ps1` / `.sh` | меню gh |
 | `_lib.ps1` / `_lib.sh` | очистка env + проверка git-репо |
-| `env.sh` | alias/function для zsh/bash |
+| `env.sh` | alias/function для zsh/bash (`github-help` там же) |

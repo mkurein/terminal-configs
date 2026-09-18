@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# command not found: github-commit — не PATH.  source ~/.zshrc
+# или: source "$HOME/Project/terminal-configs/github-proxy/env.sh"
+# напрямую: "$HOME/Project/terminal-configs/github-proxy/github-commit.sh" "msg"
+# Windows: . $PROFILE
 set -euo pipefail
 # shellcheck source=_lib.sh
 . "$(cd "$(dirname "$0")" && pwd)/_lib.sh"

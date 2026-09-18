@@ -1,3 +1,8 @@
+# «The term 'github-gh' is not recognized» — не PATH, старая сессия.
+#   . $PROFILE
+# Tip без github-gh: cd C:\Project\terminal-configs\windows\powershell; .\install.ps1; . $PROFILE
+# Напрямую: & C:\Project\terminal-configs\github-proxy\github-gh.ps1
+# macOS: source ~/.zshrc   или   source ~/Project/terminal-configs/github-proxy/env.sh
 $ErrorActionPreference = "Stop"
 . "$PSScriptRoot\_lib.ps1"
 

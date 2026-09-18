@@ -539,6 +539,18 @@ Copy-Item terminal-configs\windows\alacritty\alacritty.toml $env:APPDATA\alacrit
 
 ## 📝 Changelog
 
+### v2.4 - 2026-09-18
+- 🚀 PowerShell: `github-fetch` / `github-pull` / `github-commit` / `github-push` / `github-gh` (шаблон `terminal-configs/github-proxy`)
+- 📚 Remotes GitHub + Forgejo и проверка pull/push — корневой [README](../README.md)
+- 🔒 Убран персональный путь из `wezterm-desktop.bat`
+
+### v2.3 - 2025-11-27
+- 🚀 Переработаны `wa.bat` и `ww.bat` — автоустановка конфигов + поиск терминала в Scoop/PATH
+- ✅ Конвертация пути без `wsl wslpath` (чистый CMD)
+- ✅ WezTerm сразу запускает Zellij + LazyVim меню (как Alacritty)
+- ✅ Zellij layouts используют `nvim .` напрямую
+- ✅ Убрана кириллица из bat-файлов
+
 ### v2.2 - 2025-11-17
 - 🚀 **Автоматическая установка конфигураций** при первом запуске bat-файлов
 - ✅ Исправлен `ww.bat` - теперь корректно запускается в WSL с zsh
@@ -568,10 +580,10 @@ Copy-Item terminal-configs\windows\alacritty\alacritty.toml $env:APPDATA\alacrit
 
 ---
 
-**Версия**: 2.2 (автоустановка + улучшенные bat-файлы)  
-**Дата**: 2025-11-17  
+**Версия**: 2.4 (`github-proxy`; терминал 2.3)  
+**Дата**: 2026-09-18  
 **Платформа**: Windows 11 + WSL Ubuntu (также поддерживается Debian)  
-**Компоненты**: Alacritty, WezTerm, Zellij, LazyVim, Zsh, PowerShell
+**Компоненты**: Alacritty, WezTerm, Zellij, LazyVim, Zsh, PowerShell, github-proxy
 
 **См. также:** [macOS конфигурация](../macos/) - аналогичная структура для macOS
 

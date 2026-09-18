@@ -39,6 +39,8 @@ Copy-Item windows\powershell\Microsoft.PowerShell_profile.ps1 $PROFILE
    . $PROFILE
    ```
 
+Если `github-commit` (или другая `github-*`) пишет `is not recognized` — сессия старая, не PATH. Снова `. $PROFILE`. Tip без команды — `.\install.ps1`, потом `. $PROFILE`. Справка: `github-help`. Напрямую: `& C:\Project\terminal-configs\github-proxy\github-commit.ps1 "msg"`.
+
 ## 🚀 Доступные команды
 
 ### Навигация
@@ -93,6 +95,7 @@ gq-help             # Показать справку
 github-fetch        # git fetch без прокси (шаблон terminal-configs/github-proxy)
 github-pull
 github-commit "msg" # git commit, только staging
+github-help         # если команда не распознана: . $PROFILE
 github-push
 github-gh           # меню gh CLI без прокси
 ```

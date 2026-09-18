@@ -13,7 +13,7 @@ layout {
         pane split_direction="vertical" {
             pane split_direction="horizontal" size="40%" {
                 pane {
-                    cwd "/Users/olgazaharova/.config"
+                    cwd "~/.config"
                 }
                 pane size="40%" {
                     command "htop"
@@ -21,12 +21,12 @@ layout {
             }
             pane split_direction="horizontal" size="60%" {
                 pane size="70%" {
-                    cwd "/Users/olgazaharova/Project/ProjectPython/VPNserverManage-Clean"
+                    cwd "~/Project/ProjectPython/VPNserverManage-Clean"
                     command "zsh"
                     args "-i" "-c" "n ."
                 }
                 pane size="30%" {
-                    cwd "/Users/olgazaharova/Project/ProjectPython/VPNserverManage-Clean"
+                    cwd "~/Project/ProjectPython/VPNserverManage-Clean"
                 }
             }
         }
@@ -34,7 +34,7 @@ layout {
 
     tab name="Config" {
         pane {
-            cwd "/Users/olgazaharova/.config"
+            cwd "~/.config"
         }
     }
 }

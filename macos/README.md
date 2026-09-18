@@ -164,7 +164,7 @@ alias here='open -na Alacritty --args --working-directory "$(pwd)"'
 Отредактируйте файлы в `zellij/layouts/*.kdl`, замените:
 
 ```kdl
-cwd "/Users/olgazaharova/Project/ProjectPython/VPNserverManage-Clean"
+cwd "~/Project/ProjectPython/VPNserverManage-Clean"
 ```
 
 на ваш путь к проекту.
@@ -580,22 +580,24 @@ cd macos
 
 ---
 
-**Версия**: 2.2
-**Дата**: 2025-11-11
+**Версия**: 2.4 (`github-proxy`; терминал 2.2)
+**Дата**: 2026-09-18
 **Платформа**: macOS
 
-## 📋 Changelog v2.2 (2025-11-11)
+## 📋 Changelog
 
-### 🐛 Исправления:
-- ✅ **КРИТИЧНО**: Удалён Windows-алиас `open=explorer.exe` из `macos/zsh/aliases.zsh`
-- ✅ Добавлен комментарий о несовместимости Windows-алиасов с macOS
-- ✅ Улучшена документация по устранению неполадок
-- ✅ Добавлен диагностический скрипт `check-alacritty-setup.sh`
+### v2.4 (2026-09-18)
+- 🚀 zsh: `github-fetch` / `github-pull` / `github-commit` / `github-push` / `github-gh` через `github-proxy/env.sh`
+- 📚 Remotes GitHub + Forgejo и проверка pull/push — корневой [README](../README.md)
+- 🔒 Обезличены домашние пути в docs и Zellij layouts (`~/…` вместо конкретного пользователя)
 
-### 📚 Документация:
-- ✅ Расширен раздел "Устранение неполадок"
-- ✅ Добавлено описание известных проблем и их решений
-- ✅ Добавлены инструкции по диагностике
+### v2.2 (2025-11-11)
 
-См. [CHANGELOG](../README.md#-changelog) для полной истории изменений.
+Исправления:
+- ✅ **Критично**: удалён Windows-алиас `open=explorer.exe` из `macos/zsh/aliases.zsh`
+- ✅ Комментарий о несовместимости Windows-алиасов с macOS
+- ✅ Диагностический скрипт `check-alacritty-setup.sh`
+- ✅ Расширены устранение неполадок и известные проблемы
+
+См. [Changelog](../README.md#-changelog) в корневом README для полной истории.
 

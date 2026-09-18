@@ -435,6 +435,48 @@ function github-commit { Invoke-GitHubProxy "github-commit.ps1" @args }
 function github-push { Invoke-GitHubProxy "github-push.ps1" @args }
 function github-gh { Invoke-GitHubProxy "github-gh.ps1" @args }
 
+function github-help {
+    Write-Host "github-* — функции профиля, не PATH." -ForegroundColor Cyan
+    Write-Host "  github-fetch / github-pull / github-commit / github-push / github-gh" -ForegroundColor White
+    Write-Host ""
+    Write-Host "«The term 'github-…' is not recognized» — сессия со старым профилем:" -ForegroundColor Yellow
+    Write-Host '  . $PROFILE' -ForegroundColor White
+    Write-Host "Tip без нужной команды — переустановить профиль:" -ForegroundColor Yellow
+    Write-Host "  cd C:\Project\terminal-configs\windows\powershell" -ForegroundColor White
+    Write-Host "  .\install.ps1" -ForegroundColor White
+    Write-Host '  . $PROFILE' -ForegroundColor White
+    $root = Get-GitHubProxyHome
+    if (-not $root) { $root = "C:\Project\terminal-configs\github-proxy" }
+    Write-Host "Напрямую из любого .git:" -ForegroundColor Yellow
+    Write-Host "  & `"$root\github-commit.ps1`" `"msg`"" -ForegroundColor White
+    Write-Host "  & `"$root\github-fetch.ps1`"" -ForegroundColor White
+}
+
+try {
+    $ExecutionContext.InvokeCommand.CommandNotFoundAction = {
+        param($CommandName, $EventArgs)
+        if ($CommandName -like "github-*") {
+            Write-Host ""
+            Write-Host "Команда '$CommandName' не в этой сессии (не PATH)." -ForegroundColor Yellow
+            Write-Host "Исправление:" -ForegroundColor Cyan
+            Write-Host '  . $PROFILE' -ForegroundColor White
+            Write-Host "Если Tip без этой команды:" -ForegroundColor Cyan
+            Write-Host "  cd C:\Project\terminal-configs\windows\powershell; .\install.ps1; . `$PROFILE" -ForegroundColor White
+            $hintRoot = $null
+            if (Get-Command Get-GitHubProxyHome -ErrorAction SilentlyContinue) {
+                $hintRoot = Get-GitHubProxyHome
+            }
+            if (-not $hintRoot) { $hintRoot = "C:\Project\terminal-configs\github-proxy" }
+            Write-Host "Напрямую:" -ForegroundColor Cyan
+            Write-Host "  & `"$hintRoot\$CommandName.ps1`"" -ForegroundColor White
+            Write-Host "Справка: github-help" -ForegroundColor Cyan
+            Write-Host ""
+        }
+    }
+} catch {
+    # PS без CommandNotFoundAction — достаточно github-help и . $PROFILE
+}
+
 # ===== GIT QUICK COMMANDS HELP =====
 function Show-GqHelp {
     gq menu
@@ -442,5 +484,5 @@ function Show-GqHelp {
 Set-Alias -Name gq-help -Value Show-GqHelp
 
 Write-Host "✅ PowerShell aliases loaded!" -ForegroundColor Green
-Write-Host "💡 Tip: github-fetch / github-pull / github-commit / github-push / github-gh  |  gq-help" -ForegroundColor Cyan
+Write-Host "💡 Tip: github-fetch / github-pull / github-commit / github-push / github-gh  |  github-help  |  gq-help" -ForegroundColor Cyan
 

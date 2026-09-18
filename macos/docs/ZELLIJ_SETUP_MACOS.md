@@ -32,7 +32,7 @@ MacOS
 
 ## 📁 Структура файлов
 
-### MacOS - `/Users/olgazaharova/`
+### MacOS — домашняя директория (`~`)
 
 ```
 ~/
@@ -183,7 +183,7 @@ exec ~/start-zellij-choose.sh
 
 ```toml
 [terminal.shell]
-program = "/Users/olgazaharova/alacritty-start.sh"
+program = "~/alacritty-start.sh"
 ```
 
 **Назначение**:
@@ -319,7 +319,7 @@ fi
 В layout файлах замените путь:
 
 ```kdl
-cwd "/Users/olgazaharova/Project/ProjectPython/VPNserverManage-Clean"
+cwd "~/Project/ProjectPython/VPNserverManage-Clean"
 ```
 
 на нужный вам путь к проекту.
@@ -383,7 +383,7 @@ args "-i" "-c" "n ."
 **Решение**:
 1. Убедитесь, что в `.zshrc` НЕТ автозапуска Zellij
 2. Автозапуск должен быть ТОЛЬКО в `~/alacritty-start.sh`
-3. Alacritty должен использовать wrapper: `program = "/Users/olgazaharova/alacritty-start.sh"`
+3. Alacritty должен использовать wrapper: `program = "~/alacritty-start.sh"`
 
 ### Проблема: Меню выбора не появляется в Alacritty
 
@@ -446,8 +446,8 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 ## 📝 Заметки
 
-1. **Путь к проекту**: `/Users/olgazaharova/Project/ProjectPython/VPNserverManage-Clean` - MacOS путь к проекту
-2. **Домашняя директория**: `/Users/olgazaharova` - домашняя директория пользователя
+1. **Путь к проекту**: `~/Project/ProjectPython/VPNserverManage-Clean` — подставьте свой
+2. **Домашняя директория**: `~` (`$HOME`)
 3. **Алиас `n`**: Настроен в `~/.config/zsh/aliases.zsh` как `n='nvim'`
 4. **Персистентность сессий**: Zellij сессии сохраняются в `~/.local/share/zellij/`, но layouts позволяют быстро воссоздать структуру
 5. **Shell**: Используется Zsh с Oh My Zsh и темой Powerlevel10k

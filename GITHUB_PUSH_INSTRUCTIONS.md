@@ -30,7 +30,7 @@ git config --global credential.helper osxkeychain
 После создания GitHub покажет URL. Выполните в терминале:
 
 ```bash
-cd /Users/olgazaharova/terminal-configs
+cd ~/Project/terminal-configs
 
 # Добавьте удалённый репозиторий (замените YOUR_USERNAME и REPO_NAME)
 git remote add origin https://github.com/YOUR_USERNAME/terminal-configs.git
@@ -51,7 +51,7 @@ git push -u origin main
 ### Вариант 2: Использовать GitHub CLI (если установлен)
 
 ```bash
-cd /Users/olgazaharova/terminal-configs
+cd ~/Project/terminal-configs
 
 # Создайте репозиторий и загрузите код одной командой
 gh repo create terminal-configs --public --source=. --remote=origin --push
@@ -67,7 +67,7 @@ gh repo create terminal-configs --private --source=. --remote=origin --push
 После создания репозитория на GitHub (например, `https://github.com/yourusername/terminal-configs`):
 
 ```bash
-cd /Users/olgazaharova/terminal-configs
+cd ~/Project/terminal-configs
 
 # Настройте сохранение credentials (один раз)
 git config --global credential.helper manager  # Windows
@@ -91,7 +91,7 @@ git push -u origin main
 После того, как репозиторий создан, для загрузки изменений:
 
 ```bash
-cd /Users/olgazaharova/terminal-configs
+cd ~/Project/terminal-configs
 
 # Просмотр изменений
 git status
@@ -125,7 +125,7 @@ git push
 Когда будете готовы добавить Windows конфигурацию:
 
 ```bash
-cd /Users/olgazaharova/terminal-configs
+cd ~/Project/terminal-configs
 
 # Скопируйте ваши Windows файлы в windows/
 # Например:
@@ -678,7 +678,7 @@ Copy-Item windows\wa*.bat C:\Windows\System32\
 
 ```powershell
 # PowerShell
-cd C:\Users\ВашеИмя\terminal-configs
+cd C:\Project\terminal-configs
 
 # Или WSL
 wsl
