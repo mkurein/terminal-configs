@@ -34,6 +34,7 @@ alias github-gh=github_gh
 github_help() {
   echo "github-* — aliases from env.sh, not PATH."
   echo "  github-fetch / github-pull / github-commit / github-push / github-gh"
+  echo "  github-commit \"one line\"  |  github-commit   (Ctrl-D)  |  github-commit -e"
   echo ""
   echo "command not found — reload this shell:"
   echo "  source ~/.zshrc"

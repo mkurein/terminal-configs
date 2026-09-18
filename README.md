@@ -32,7 +32,7 @@
 |---|---|
 | `github-fetch` | fetch **каждого** remote этого репо (мёртвый URL пропускает) |
 | `github-pull` | `git pull` текущей ветки с tracking (`origin` = GitHub) |
-| `github-commit` | `git commit -m …` только **уже в staging** (`git add` сам не делает) |
+| `github-commit` | commit только **staging**; одна строка в кавычках, много строк — без аргументов (Ctrl-D) или `-e` |
 | `github-push` | `git push -u origin HEAD` на **все** push-URL `origin` |
 | `github-gh` | меню `gh` CLI без прокси (auth, PR, runs — будем расширять) |
 
@@ -294,6 +294,8 @@ github-pull           # влить origin/текущая-ветка
 # … правки …
 git add path/to/file
 github-commit "краткое why"
+# много строк: github-commit   затем вставить текст, Ctrl-D
+# или: github-commit -e
 git branch --show-current    # не пушить main вслепую
 github-push           # GitHub и NAS одним разом
 github-gh             # PR / auth / CI, когда нужно
@@ -302,6 +304,45 @@ github-gh             # PR / auth / CI, когда нужно
 В Tip после `. $PROFILE` должны быть все имена, включая `github-commit`. Если нет — `install.ps1`, снова `. $PROFILE`. Справка: `github-help`.
 
 macOS: те же имена команд. Если Forgejo в браузере пустой — туда ещё не было `github-push` (или push шёл только на GitHub). После успешного push страница `:3000` показывает те же коммиты.
+
+### `github-commit` — одна строка и несколько строк
+
+Только **уже в staging** (`git add` сам не делает). Не пушит, без `--no-verify`.
+
+**Одна строка** — всегда в кавычках. Без кавычек хвост сообщения станет командами zsh/PowerShell:
+
+```bash
+github-commit "краткое why"
+```
+
+**Несколько строк нельзя вставлять в приглашение shell** (после `❯` / `PS>`). Сначала запусти `github-commit` **без аргументов**, потом вставляй текст.
+
+Первая строка — тема, пустая строка, дальше тело.
+
+**macOS / zsh:**
+
+```bash
+git add path/to/file
+github-commit
+# вставить тему, пустую строку, тело — закончить Ctrl-D
+```
+
+или heredoc (хвост не уйдёт в zsh):
+
+```bash
+github-commit <<'EOF'
+Тема коммита
+
+Первый абзац.
+Второй абзац.
+EOF
+```
+
+Редактор: `github-commit -e`.
+
+**Windows:** `github-commit` без аргументов, строки сообщения, последняя строка только `.` — или `github-commit -e`.
+
+Подробности: [`github-proxy/GIT_PS_GUIDE.md`](./github-proxy/GIT_PS_GUIDE.md) раздел **github-commit**.
 
 ### `github-gh` (заготовка)
 

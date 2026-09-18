@@ -119,14 +119,35 @@ git -c http.proxy= -c https.proxy= pull --ff-only
 
 ## `github-commit`
 
-`git commit -m` для **уже проиндексированных** файлов. **Не** делает `git add`, **не** пушит, **без** `--no-verify`.
+`git commit` для **уже проиндексированных** файлов. **Не** делает `git add`, **не** пушит, **без** `--no-verify`.
+
+Одна строка (кавычки обязательны, иначе хвост уйдёт в shell):
 
 ```powershell
 git add README.md
 github-commit "Document new Windows and macOS setup."
 ```
 
-Без аргумента спросит сообщение. Пустой staging — выход с подсказкой `git add first`.
+Несколько строк — **не** вставлять текст в приглашение zsh/PowerShell. Сначала команда без аргументов:
+
+**macOS / bash / zsh** — вставка, потом Ctrl-D; или heredoc:
+
+```bash
+github-commit
+# paste subject, blank line, body, Ctrl-D
+
+github-commit <<'EOF'
+Subject line
+
+Body paragraph.
+EOF
+
+github-commit -e    # $EDITOR
+```
+
+**Windows** — пустой вызов, строки, последняя строка только `.` ; или `github-commit -e`.
+
+Пустой staging — выход с подсказкой `git add first`.
 
 ---
 

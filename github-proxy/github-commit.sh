@@ -12,19 +12,32 @@ github_proxy_clear
 
 echo "Proxy variables cleared for this terminal session."
 
-msg="$*"
-if [[ -z "${msg// }" ]]; then
-  read -r -p "Commit message: " msg
-fi
-if [[ -z "${msg// }" ]]; then
-  echo "Commit message cannot be empty." >&2
-  exit 1
-fi
-
 if git diff --cached --quiet; then
   echo "Nothing staged. git add first, then github-commit." >&2
   exit 1
 fi
 
-echo "Running: git commit -m ..."
-git commit -m "$msg"
+if [[ "${1:-}" == "-e" || "${1:-}" == "--edit" ]]; then
+  echo "Running: git commit  (editor)"
+  git commit
+  exit 0
+fi
+
+msg=""
+if [[ $# -gt 0 ]]; then
+  msg="$*"
+else
+  if [[ -t 0 ]]; then
+    echo "Commit message: first line = subject, blank line, then body."
+    echo "Paste here (not at the zsh prompt). Finish with Ctrl-D."
+  fi
+  msg=$(cat)
+fi
+msg="${msg%"${msg##*[![:space:]]}"}"
+if [[ -z "$msg" ]]; then
+  echo "Commit message cannot be empty." >&2
+  exit 1
+fi
+
+echo "Running: git commit -F -"
+git commit -F - <<<"$msg"

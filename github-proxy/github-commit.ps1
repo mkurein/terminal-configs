@@ -11,16 +11,6 @@ Clear-GitHubProxyEnv
 
 Write-Host "Proxy variables cleared for this terminal session." -ForegroundColor Green
 
-$msgParts = @($args | Where-Object { $null -ne $_ -and "$_".Trim() -ne "" })
-$msg = ($msgParts -join " ").Trim()
-if (-not $msg) {
-    $msg = (Read-Host "Commit message").Trim()
-}
-if (-not $msg) {
-    Write-Host "Commit message cannot be empty." -ForegroundColor Yellow
-    exit 1
-}
-
 $errPref = $ErrorActionPreference
 $ErrorActionPreference = "Continue"
 git diff --cached --quiet
@@ -31,5 +21,41 @@ if ($stagedEmpty) {
     exit 1
 }
 
-Write-Host "Running: git commit -m ..." -ForegroundColor Cyan
-git commit -m $msg
+if ($args.Count -ge 1 -and ($args[0] -eq "-e" -or $args[0] -eq "--edit")) {
+    Write-Host "Running: git commit  (editor)" -ForegroundColor Cyan
+    git commit
+    exit $LASTEXITCODE
+}
+
+$msg = ""
+if ($args.Count -gt 0) {
+    $msg = ($args -join " ").Trim()
+} elseif ([Console]::IsInputRedirected) {
+    $msg = [Console]::In.ReadToEnd()
+} else {
+    Write-Host "Commit message: first line = subject, blank line, then body." -ForegroundColor Cyan
+    Write-Host "Finish with a line that is only: ." -ForegroundColor Cyan
+    Write-Host "Or: github-commit -e   (editor)" -ForegroundColor DarkGray
+    $lines = New-Object System.Collections.Generic.List[string]
+    while ($true) {
+        $line = Read-Host
+        if ($line -eq ".") { break }
+        [void]$lines.Add($line)
+    }
+    $msg = [string]::Join("`n", $lines.ToArray())
+}
+
+$msg = $msg.Trim()
+if (-not $msg) {
+    Write-Host "Commit message cannot be empty." -ForegroundColor Yellow
+    exit 1
+}
+
+$tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("gh-commit-" + [guid]::NewGuid().ToString() + ".txt")
+try {
+    [System.IO.File]::WriteAllText($tmp, $msg)
+    Write-Host "Running: git commit -F ..." -ForegroundColor Cyan
+    git commit -F $tmp
+} finally {
+    if (Test-Path $tmp) { Remove-Item -Force $tmp }
+}
