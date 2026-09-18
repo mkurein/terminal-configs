@@ -2,7 +2,93 @@
 
 Кроссплатформенный репозиторий конфигураций для терминала с **Alacritty / WezTerm + Zellij + Neovim**.
 
-## 📋 Содержание
+Публичный канон на GitHub: [mkurein/terminal-configs](https://github.com/mkurein/terminal-configs).  
+Домашнее зеркало на NAS: [mxm/terminal-configs](http://100.64.0.12:3000/mxm/terminal-configs) (Forgejo, веб). Git по SSH, не по этой HTTP-ссылке.
+
+Общие git/gh-обёртки без SOCKS-прокси: [`github-proxy/`](./github-proxy/) — подробности в [`github-proxy/GIT_PS_GUIDE.md`](./github-proxy/GIT_PS_GUIDE.md). Этот раздел README — **как работать каждый день**. Скрипты и пункты `github-gh` будем наращивать здесь же.
+
+---
+
+## Как работать с GitHub и Forgejo
+
+### Зачем две копии
+
+| Куда | Зачем | URL для git |
+|---|---|---|
+| GitHub `mkurein/terminal-configs` | публичный origin, `gh`, PR, Actions | `https://github.com/mkurein/terminal-configs.git` |
+| Forgejo `mxm/terminal-configs` | зеркало на NAS, домашний backup | `ssh://git@100.64.0.12:2222/mxm/terminal-configs.git` |
+
+Веб Forgejo (`http://100.64.0.12:3000/mxm/terminal-configs.git`) — **страница в браузере**. `git clone` / `git pull` / `git push` по HTTP `:3000` не используем: пустой репо, логин, прокси. Для git — только SSH `:2222` (из дома тот же хост через Tailscale).
+
+`origin` **скачивает с GitHub** и **пушит сразу в оба** (GitHub + Forgejo), как Lite / ApiHA / homelab-book.
+
+### Один раз на машине
+
+PowerShell-профиль (Windows) или zsh aliases (macOS) из этого репо. Новый терминал, либо:
+
+```powershell
+. $PROFILE
+```
+
+После этого из **любого** git-репо (не только этого):
+
+| Команда | Что делает |
+|---|---|
+| `github-fetch` | `git fetch --all` без HTTP/SOCKS-прокси |
+| `github-pull` | `git pull` текущей ветки с tracking (`origin` = GitHub) |
+| `github-push` | `git push -u origin HEAD` на **все** push-URL `origin` |
+| `github-gh` | меню `gh` CLI без прокси (auth, PR, runs — будем расширять) |
+
+Это не `gq` / `gp` / `gl`: они прокси не чистят. Для GitHub по HTTPS с живым SOCKS — только `github-*`.
+
+Remotes этого репо (если ещё старый `kureinmaxim` или нет Forgejo):
+
+```powershell
+cd C:\Project\terminal-configs   # на Mac — путь к clone
+
+git remote set-url origin https://github.com/mkurein/terminal-configs.git
+git remote set-url --push origin https://github.com/mkurein/terminal-configs.git
+git remote set-url --add --push origin ssh://git@100.64.0.12:2222/mxm/terminal-configs.git
+git remote remove forgejo 2>$null
+git remote add forgejo ssh://git@100.64.0.12:2222/mxm/terminal-configs.git
+```
+
+Проверка: `git remote -v` — fetch GitHub, два push (GitHub + SSH Forgejo), отдельно `forgejo` для `fetch --all`.
+
+### Обычный день
+
+Терминал уже в нужном проекте (`terminal-configs`, Lite, ApiHA, …).
+
+```powershell
+github-fetch          # GitHub + Forgejo, без слияния
+git status
+github-pull           # влить origin/текущая-ветка
+# … правки, git add, git commit …
+git branch --show-current    # не пушить main вслепую
+github-push           # GitHub и NAS одним разом
+github-gh             # PR / auth / CI, когда нужно
+```
+
+macOS: те же имена (`github-fetch` …). Первый clone шаблона:
+
+```bash
+git clone https://github.com/mkurein/terminal-configs.git ~/Project/terminal-configs
+cd ~/Project/terminal-configs/macos && ./install.sh
+```
+
+Windows-профиль: `windows/powershell/install.ps1`.
+
+Если Forgejo в браузере пустой — туда ещё не было `github-push` (или push шёл только на GitHub). После успешного push страница `:3000` показывает те же коммиты.
+
+### `github-gh` (заготовка)
+
+Сейчас: статус логина, login/refresh, открыть репо, список/создание PR, последние Actions.  
+Дальше: больше повседневных `gh` и CLI (релизы, issues, workflow). Канон меню — `github-proxy/github-gh.ps1` и `.sh`, описание — этот README + `GIT_PS_GUIDE.md`.
+
+---
+
+## Содержание
+
 
 ### 🍎 [macOS](./macos/)
 Конфигурация для macOS с:
@@ -53,22 +139,14 @@
 
 ---
 
-### GitHub без прокси
-
-Общий шаблон (не копировать в каждый проект): [`github-proxy/GIT_PS_GUIDE.md`](./github-proxy/GIT_PS_GUIDE.md).
-
-После профиля: `github-fetch`, `github-pull`, `github-push`, `github-gh` из любого git-репо.
-
----
-
 ## 🚀 Быстрый старт
 
 ### macOS
 
 1. **Клонируйте репозиторий**:
 ```bash
-git clone <your-repo-url> ~/terminal-configs-backup
-cd ~/terminal-configs-backup
+git clone https://github.com/mkurein/terminal-configs.git ~/terminal-configs
+cd ~/terminal-configs
 ```
 
 2. **Запустите установку**:
@@ -95,7 +173,7 @@ cargo install zellij
 
 2. **Клонируйте репозиторий** (в WSL):
 ```bash
-git clone <your-repo-url> ~/terminal-configs
+git clone https://github.com/mkurein/terminal-configs.git ~/terminal-configs
 cd ~/terminal-configs
 ```
 

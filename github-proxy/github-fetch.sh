@@ -7,6 +7,11 @@ github_proxy_require_git
 github_proxy_clear
 
 echo "Proxy variables cleared for this terminal session."
-echo "Running: git -c http.proxy= -c https.proxy= fetch"
 
-git -c http.proxy= -c https.proxy= fetch "$@"
+if [[ $# -eq 0 ]]; then
+  echo "Running: git -c http.proxy= -c https.proxy= fetch --all"
+  git -c http.proxy= -c https.proxy= fetch --all
+else
+  echo "Running: git -c http.proxy= -c https.proxy= fetch $*"
+  git -c http.proxy= -c https.proxy= fetch "$@"
+fi

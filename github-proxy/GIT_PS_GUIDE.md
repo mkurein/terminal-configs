@@ -36,7 +36,7 @@ export GITHUB_PROXY_HOME="$HOME/Project/terminal-configs/github-proxy"
 
 | Операция | Команда | Что внутри |
 |---|---|---|
-| `git fetch` без прокси | `github-fetch` | `git -c http.proxy= -c https.proxy= fetch` |
+| `git fetch --all` без прокси | `github-fetch` | все remote (`origin` = GitHub, `forgejo` = NAS), без merge |
 | `git pull` без прокси | `github-pull` | то же + merge/rebase в текущую ветку |
 | `git push -u origin HEAD` без прокси | `github-push` | текущая ветка на все push-URL `origin` |
 | меню `gh` CLI без прокси | `github-gh` | auth, PR, CI runs |
@@ -91,7 +91,7 @@ brew install gh
 
 ## `github-fetch`
 
-Подтягивает с `origin` все remote-ветки в `origin/*`, **не сливая** с локальными.
+Подтягивает с **всех** remote (`origin`, `forgejo`, …) свежие коммиты в `origin/*` / `forgejo/*`, **не сливая** с локальными. Без аргументов это `git fetch --all`. Явный remote: `github-fetch origin`.
 
 Когда: посмотреть, что нового; перед checkout; две машины.
 
