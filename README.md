@@ -53,7 +53,26 @@ git remote remove forgejo 2>$null
 git remote add forgejo ssh://git@100.64.0.12:2222/mxm/terminal-configs.git
 ```
 
-Проверка: `git remote -v` — fetch GitHub, два push (GitHub + SSH Forgejo), отдельно `forgejo` для `fetch --all`.
+Проверка — `git remote -v` должен выглядеть так (это **правильно**):
+
+```
+forgejo  ssh://git@100.64.0.12:2222/mxm/terminal-configs.git (fetch)
+forgejo  ssh://git@100.64.0.12:2222/mxm/terminal-configs.git (push)
+origin   https://github.com/mkurein/terminal-configs.git (fetch)
+origin   https://github.com/mkurein/terminal-configs.git (push)
+origin   ssh://git@100.64.0.12:2222/mxm/terminal-configs.git (push)
+```
+
+Что значит каждая строка:
+
+| Строка | Зачем |
+|---|---|
+| `origin` fetch HTTPS GitHub | `github-pull` / tracking ветки качают отсюда |
+| `origin` push HTTPS GitHub | публичная копия |
+| `origin` push SSH Forgejo | тот же `github-push` сразу зеркалит на NAS |
+| `forgejo` fetch+push SSH | отдельное имя, чтобы `github-fetch` (`git fetch --all`) видел NAS, а не только GitHub |
+
+Веб `http://100.64.0.12:3000/mxm/terminal-configs` (с `.git` или без) в remotes **быть не должен**. Git — только `ssh://git@100.64.0.12:2222/mxm/terminal-configs.git`.
 
 ### Обычный день
 
