@@ -6,7 +6,10 @@ Clear-GitHubProxyEnv
 
 Write-Host "Proxy variables cleared for this terminal session." -ForegroundColor Green
 
-if ($args.Count -eq 0) {
+# Profile wrapper can splat a lone $null; treat that as "no args".
+$fetchArgs = @($args | Where-Object { $null -ne $_ -and "$_".Trim() -ne "" })
+
+if ($fetchArgs.Count -eq 0) {
     Write-Host "Running: git fetch for each remote (skip missing/unreachable)" -ForegroundColor Cyan
     $nativePref = $PSNativeCommandUseErrorActionPreference
     $errPref = $ErrorActionPreference
@@ -29,6 +32,6 @@ if ($args.Count -eq 0) {
         Write-Host "Fetch finished; at least one remote was skipped." -ForegroundColor Yellow
     }
 } else {
-    Write-Host "Running: git -c http.proxy= -c https.proxy= fetch $args" -ForegroundColor Cyan
-    git -c http.proxy= -c https.proxy= fetch @args
+    Write-Host "Running: git -c http.proxy= -c https.proxy= fetch $fetchArgs" -ForegroundColor Cyan
+    git -c http.proxy= -c https.proxy= fetch @fetchArgs
 }

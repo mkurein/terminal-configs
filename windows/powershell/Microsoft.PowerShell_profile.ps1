@@ -420,7 +420,13 @@ function Invoke-GitHubProxy {
         Write-Host "github-proxy template not found. Clone terminal-configs or set GITHUB_PROXY_HOME." -ForegroundColor Red
         return
     }
-    & (Join-Path $root $Script) @ScriptArgs
+    $path = Join-Path $root $Script
+    $pass = @($ScriptArgs | Where-Object { $null -ne $_ -and "$_".Trim() -ne "" })
+    if ($pass.Count -gt 0) {
+        & $path @pass
+    } else {
+        & $path
+    }
 }
 
 function github-fetch { Invoke-GitHubProxy "github-fetch.ps1" @args }
