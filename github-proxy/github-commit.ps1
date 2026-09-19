@@ -33,12 +33,18 @@ if ($args.Count -gt 0) {
 } elseif ([Console]::IsInputRedirected) {
     $msg = [Console]::In.ReadToEnd()
 } else {
-    Write-Host "Commit message: first line = subject, blank line, then body." -ForegroundColor Cyan
-    Write-Host "Finish with a line that is only: ." -ForegroundColor Cyan
-    Write-Host "Or: github-commit -e   (editor)" -ForegroundColor DarkGray
+    Write-Host ""
+    Write-Host "Сообщение коммита. Проще всего:" -ForegroundColor Cyan
+    Write-Host "  1) одна строка темы" -ForegroundColor White
+    Write-Host "  2) на следующей строке только точка  ." -ForegroundColor White
+    Write-Host "Пустая строка не нужна. Она только если после темы хотите абзац." -ForegroundColor DarkGray
+    Write-Host "Отмена: Ctrl+C. Редактор: github-commit -e" -ForegroundColor DarkGray
+    Write-Host "Или сразу: github-commit `"тема в кавычках`"" -ForegroundColor DarkGray
+    Write-Host ""
     $lines = New-Object System.Collections.Generic.List[string]
     while ($true) {
-        $line = Read-Host
+        $hint = if ($lines.Count -eq 0) { "тема" } else { "ещё строка или ." }
+        $line = Read-Host $hint
         if ($line -eq ".") { break }
         [void]$lines.Add($line)
     }

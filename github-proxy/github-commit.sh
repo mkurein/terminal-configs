@@ -28,8 +28,12 @@ if [[ $# -gt 0 ]]; then
   msg="$*"
 else
   if [[ -t 0 ]]; then
-    echo "Commit message: first line = subject, blank line, then body."
-    echo "Paste here (not at the zsh prompt). Finish with Ctrl-D."
+    echo ""
+    echo "Сообщение коммита. Проще всего: одна строка темы, потом Ctrl-D."
+    echo "Пустая строка не нужна. Она только если после темы хотите абзац."
+    echo "Пишите здесь, не в приглашении zsh. Отмена: Ctrl-C. Редактор: github-commit -e"
+    echo "Или сразу: github-commit \"тема в кавычках\""
+    echo ""
   fi
   msg=$(cat)
 fi

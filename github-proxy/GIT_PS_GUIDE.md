@@ -134,7 +134,7 @@ github-commit "Document new Windows and macOS setup."
 
 ```bash
 github-commit
-# paste subject, blank line, body, Ctrl-D
+# одна строка темы, Ctrl-D  (пустая не нужна; абзац — по желанию)
 
 github-commit <<'EOF'
 Subject line
@@ -145,7 +145,7 @@ EOF
 github-commit -e    # $EDITOR
 ```
 
-**Windows** — пустой вызов, строки, последняя строка только `.` ; или `github-commit -e`.
+**Windows** — пустой вызов, строка темы, потом строка только `.` (пустая не нужна); или `github-commit -e`.
 
 Пустой staging — выход с подсказкой `git add first`.
 
