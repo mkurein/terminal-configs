@@ -27,6 +27,9 @@ if (Test-Path -Path $profilePath) {
 $scriptPath = Join-Path $PSScriptRoot "Microsoft.PowerShell_profile.ps1"
 if (Test-Path -Path $scriptPath) {
     Copy-Item -Path $scriptPath -Destination $profilePath -Force
+    $utf8Bom = New-Object System.Text.UTF8Encoding $true
+    $profileText = [System.IO.File]::ReadAllText($profilePath)
+    [System.IO.File]::WriteAllText($profilePath, $profileText, $utf8Bom)
     Write-Host "✓ Профиль установлен: $profilePath" -ForegroundColor Green
 } else {
     Write-Host "✗ Файл профиля не найден: $scriptPath" -ForegroundColor Red

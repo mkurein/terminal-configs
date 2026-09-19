@@ -55,79 +55,120 @@ function gq {
     )
     
     switch ($cmd.ToLower()) {
-        { $_ -in "s", "status" } {
-            git status
-        }
-        
-        { $_ -in "a", "add" } {
+        "s" { git status }
+        "status" { git status }
+
+        "a" {
             git add .
-            Write-Host "✓ Все файлы добавлены в staging" -ForegroundColor Green
+            Write-Host "All files staged" -ForegroundColor Green
         }
-        
-        { $_ -in "c", "commit" } {
+        "add" {
+            git add .
+            Write-Host "All files staged" -ForegroundColor Green
+        }
+
+        "c" {
             if ([string]::IsNullOrWhiteSpace($msg)) {
-                $msg = Read-Host "📝 Сообщение коммита"
+                $msg = Read-Host "Commit message"
             }
             if ($msg) {
                 git commit -m $msg
             } else {
-                Write-Host "✗ Сообщение коммита не может быть пустым" -ForegroundColor Red
+                Write-Host "Commit message cannot be empty" -ForegroundColor Red
             }
         }
-        
-        { $_ -in "p", "push" } {
-            $branch = git branch --show-current
-            Write-Host "📤 Push в $branch..." -ForegroundColor Cyan
-            git push origin $branch
-        }
-        
-        { $_ -in "l", "log" } {
-            git log --oneline --graph --decorate --all -20
-        }
-        
-        { $_ -in "ac", "quick" } {
-            git add .
+        "commit" {
             if ([string]::IsNullOrWhiteSpace($msg)) {
-                $msg = Read-Host "📝 Сообщение коммита"
+                $msg = Read-Host "Commit message"
             }
             if ($msg) {
                 git commit -m $msg
-                Write-Host "✓ Коммит создан: $msg" -ForegroundColor Green
+            } else {
+                Write-Host "Commit message cannot be empty" -ForegroundColor Red
             }
         }
-        
-        { $_ -in "acp", "full" } {
+
+        "p" {
+            $branch = git branch --show-current
+            Write-Host "Push $branch..." -ForegroundColor Cyan
+            git push origin $branch
+        }
+        "push" {
+            $branch = git branch --show-current
+            Write-Host "Push $branch..." -ForegroundColor Cyan
+            git push origin $branch
+        }
+
+        "l" { git log --oneline --graph --decorate --all -20 }
+        "log" { git log --oneline --graph --decorate --all -20 }
+
+        "ac" {
             git add .
             if ([string]::IsNullOrWhiteSpace($msg)) {
-                $msg = Read-Host "📝 Сообщение коммита"
+                $msg = Read-Host "Commit message"
+            }
+            if ($msg) {
+                git commit -m $msg
+                Write-Host "Committed: $msg" -ForegroundColor Green
+            }
+        }
+        "quick" {
+            git add .
+            if ([string]::IsNullOrWhiteSpace($msg)) {
+                $msg = Read-Host "Commit message"
+            }
+            if ($msg) {
+                git commit -m $msg
+                Write-Host "Committed: $msg" -ForegroundColor Green
+            }
+        }
+
+        "acp" {
+            git add .
+            if ([string]::IsNullOrWhiteSpace($msg)) {
+                $msg = Read-Host "Commit message"
             }
             if ($msg) {
                 git commit -m $msg
                 $branch = git branch --show-current
                 git push origin $branch
-                Write-Host "✓ Изменения запушены!" -ForegroundColor Green
+                Write-Host "Pushed" -ForegroundColor Green
             } else {
-                Write-Host "✗ Сообщение коммита не может быть пустым" -ForegroundColor Red
+                Write-Host "Commit message cannot be empty" -ForegroundColor Red
             }
         }
-        
-        { $_ -eq "sync" } {
+        "full" {
+            git add .
+            if ([string]::IsNullOrWhiteSpace($msg)) {
+                $msg = Read-Host "Commit message"
+            }
+            if ($msg) {
+                git commit -m $msg
+                $branch = git branch --show-current
+                git push origin $branch
+                Write-Host "Pushed" -ForegroundColor Green
+            } else {
+                Write-Host "Commit message cannot be empty" -ForegroundColor Red
+            }
+        }
+
+        "sync" {
             $branch = git branch --show-current
-            Write-Host "🔄 Синхронизация с main/master..." -ForegroundColor Cyan
+            Write-Host "Sync with main/master..." -ForegroundColor Cyan
             git fetch origin
             git pull origin main 2>$null
             if ($LASTEXITCODE -ne 0) {
                 git pull origin master 2>$null
             }
-            Write-Host "✓ Синхронизация завершена" -ForegroundColor Green
+            Write-Host "Sync done" -ForegroundColor Green
         }
-        
-        { $_ -eq "undo" } {
-            Write-Host "⚠️  Отменить последний коммит (сохранив изменения)" -ForegroundColor Yellow
-            $confirm = Read-Host "Продолжить? [y/N]"
+
+        "undo" {
+            Write-Host "Undo last commit (keep changes)" -ForegroundColor Yellow
+            $confirm = Read-Host "Continue? [y/N]"
             if ($confirm -eq "y" -or $confirm -eq "Y") {
                 git reset --soft HEAD~1
-                Write-Host "✓ Коммит отменен" -ForegroundColor Green
+                Write-Host "Commit undone" -ForegroundColor Green
             }
         }
         
@@ -212,8 +253,11 @@ function ports {
 
 # Обновление системы (WSL)
 function update {
-    wsl sudo apt update && wsl sudo apt upgrade -y
+    wsl bash -lc "sudo apt update && sudo apt upgrade -y"
 }
+
+function htop { wsl -d Debian -- htop }
+function btop { wsl -d Debian -- btop }
 
 # Установка пакетов (WSL)
 function install {
