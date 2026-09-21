@@ -9,6 +9,40 @@
 
 ---
 
+## Терминал: ветка и `. $PROFILE`
+
+PowerShell **сам** ветку не показывает. По умолчанию только путь:
+
+```text
+PS C:\Project\homelab-book>
+```
+
+После установки профиля из `windows/powershell/` в git-репозитории будет:
+
+```text
+PS C:\Project\homelab-book [main]>
+```
+
+`[main]` — текущая ветка **этого** каталога (homelab-book, Lite, terminal-configs, …), жёлтым. Не в git — как раньше, без скобок.
+
+**Уже открытая вкладка Cursor этого не видит.** Профиль читается один раз при старте окна; Cursor ещё и запоминает тогдашний `prompt`. Подхватить правки **в этой же** сессии:
+
+```powershell
+. $PROFILE
+```
+
+Или открыть новый терминал.
+
+`$PROFILE` — путь к файлу профиля этого PowerShell (не команда и не PATH). Обычно `…\Documents\PowerShell\Microsoft.PowerShell_profile.ps1` (часто под OneDrive). Точка `.` — выполнить файл **здесь** (как `source ~/.zshrc`). Не ставит Git, не клонирует репо, не пушит. После правок `windows/powershell/Microsoft.PowerShell_profile.ps1` сначала `.\install.ps1`, потом снова `. $PROFILE`.
+
+Проверка: `echo $PROFILE`. Если после точки в Tip нет `github-fetch` — профиль на диске старый, нужен `install.ps1`.
+
+`github-fetch` отдельно печатает `Current branch:` и `git status -sb` — это вывод команды, не приглашение.
+
+macOS: ветка обычно уже в prompt (Powerlevel10k). После правок zsh: `source ~/.zshrc`.
+
+---
+
 ## Как работать с GitHub и Forgejo
 
 ### Зачем две копии
@@ -30,7 +64,7 @@
 
 | Команда | Что делает |
 |---|---|
-| `github-fetch` | fetch **каждого** remote этого репо (мёртвый URL пропускает) |
+| `github-fetch` | fetch **каждого** remote этого репо (мёртвый URL пропускает); сразу печатает текущую ветку |
 | `github-pull` | `git pull` текущей ветки с tracking (`origin` = GitHub) |
 | `github-commit` | commit только **staging**; одна строка в кавычках, много строк — без аргументов (Ctrl-D) или `-e` |
 | `github-push` | `git push -u origin HEAD` на **все** push-URL `origin` |
@@ -48,9 +82,7 @@
 . $PROFILE
 ```
 
-**Что это делает.** `$PROFILE` — путь к файлу профиля этого PowerShell (не команда и не PATH). Обычно `…\Documents\PowerShell\Microsoft.PowerShell_profile.ps1` (часто под OneDrive). Точка `.` — выполнить файл **в текущей** сессии (как `source` в zsh).
-
-Профиль читается **один раз при открытии** окна. `github-fetch` / `github-commit` — функции из этого файла, их нет в PATH. После `install.ps1` или правок профиля уже открытый терминал ничего не знает, пока не сделать `. $PROFILE` (или не открыть новое окно). Команда не ставит Git, не клонирует репо и не меняет файлы на диске: только заново объявляет функции **здесь**.
+Зачем точка и что такое `$PROFILE` — в начале README, раздел «Терминал: ветка и `. $PROFILE`». То же самое чинит приглашение без `[ветка]` и «is not recognized». `github-fetch` / `github-commit` живут в профиле, не в PATH.
 
 Проверка: `echo $PROFILE` — какой файл; после точки в Tip должны быть все имена, включая `github-commit`. Если нет — профиль на диске старый:
 
@@ -104,7 +136,7 @@ cd C:\Project\terminal-configs\windows\powershell
 4. Новый терминал или `. $PROFILE`.
 5. Для `github-gh` один раз: `gh auth login` (или пункт меню).
 
-Проверка: в любом git-репо `github-fetch` печатает `Fetching origin` (и `Fetching forgejo`, если этот remote есть).
+Проверка: в любом git-репо `github-fetch` сразу печатает текущую ветку, затем `Fetching origin` (и `Fetching forgejo`, если этот remote есть).
 
 Профиль не «живёт» внутри clone. Если обновился `windows/powershell/Microsoft.PowerShell_profile.ps1` — снова `.\install.ps1`.
 

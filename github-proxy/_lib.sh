@@ -31,3 +31,13 @@ github_proxy_require_git() {
     exit 1
   fi
 }
+
+github_proxy_status() {
+  local branch
+  branch="$(git --no-pager branch --show-current 2>/dev/null || true)"
+  if [[ -z "$branch" ]]; then
+    branch="(detached HEAD)"
+  fi
+  echo "Current branch: $branch"
+  git --no-pager status -sb
+}

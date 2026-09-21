@@ -11,6 +11,7 @@ github_proxy_require_git
 github_proxy_clear
 
 echo "Proxy variables cleared for this terminal session."
+github_proxy_status
 
 if [[ $# -eq 0 ]]; then
   echo "Running: git fetch for each remote (skip missing/unreachable)"
@@ -31,3 +32,5 @@ else
   echo "Running: git -c http.proxy= -c https.proxy= fetch $*"
   git -c http.proxy= -c https.proxy= fetch "$@"
 fi
+
+github_proxy_status

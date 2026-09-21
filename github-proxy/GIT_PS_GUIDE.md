@@ -97,7 +97,7 @@ brew install gh
 
 ## `github-fetch`
 
-Подтягивает с **всех** remote (`origin`, `forgejo`, …) свежие коммиты в `origin/*` / `forgejo/*`, **не сливая** с локальными. Без аргументов — fetch **каждого** remote по очереди: мёртвый URL (`Repository not found`) пропускается с warning, остальные докачиваются. Явный remote: `github-fetch origin` (ошибка этого remote уже не глотается).
+Подтягивает с **всех** remote (`origin`, `forgejo`, …) свежие коммиты в `origin/*` / `forgejo/*`, **не сливая** с локальными. Без аргументов — fetch **каждого** remote по очереди: мёртвый URL (`Repository not found`) пропускается с warning, остальные докачиваются. Явный remote: `github-fetch origin` (ошибка этого remote уже не глотается). Сразу печатает текущую ветку и `git status -sb` (до и после fetch).
 
 Когда: посмотреть, что нового; перед checkout; две машины.
 

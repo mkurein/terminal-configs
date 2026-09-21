@@ -40,3 +40,10 @@ function Assert-GitHubWorkTree {
         exit 1
     }
 }
+
+function Show-GitHubRepoStatus {
+    $branch = (git --no-pager branch --show-current 2>$null | Out-String).Trim()
+    if (-not $branch) { $branch = "(detached HEAD)" }
+    Write-Host "Current branch: $branch" -ForegroundColor Cyan
+    git --no-pager status -sb
+}

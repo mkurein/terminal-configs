@@ -527,6 +527,43 @@ function Show-GqHelp {
 }
 Set-Alias -Name gq-help -Value Show-GqHelp
 
+# Default PowerShell prompt is only "PS C:\path>" — no git branch.
+# Cursor/VS Code wraps Prompt at session start and keeps that snapshot;
+# after `. $PROFILE` we refresh OriginalPrompt so an already-open tab picks this up.
+function global:__GitBranchPrompt {
+    $loc = $executionContext.SessionState.Path.CurrentLocation.Path
+    $git = ""
+    try {
+        $prevEap = $ErrorActionPreference
+        $ErrorActionPreference = "SilentlyContinue"
+        $prevNative = $null
+        if (Get-Variable -Name PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue) {
+            $prevNative = $PSNativeCommandUseErrorActionPreference
+            $PSNativeCommandUseErrorActionPreference = $false
+        }
+        $inside = git rev-parse --is-inside-work-tree 2>$null
+        if ("$inside".Trim() -eq "true") {
+            $branch = (git --no-pager branch --show-current 2>$null | Out-String).Trim()
+            if (-not $branch) { $branch = "detached" }
+            $esc = [char]27
+            $git = " ${esc}[33m[$branch]${esc}[0m"
+        }
+        if ($null -ne $prevNative) {
+            $PSNativeCommandUseErrorActionPreference = $prevNative
+        }
+        $ErrorActionPreference = $prevEap
+    } catch {
+        # never break the prompt
+    }
+    "PS $loc$git> "
+}
+
+if ($Global:__VSCodeState -and $Global:__VSCodeState.ContainsKey("OriginalPrompt")) {
+    $Global:__VSCodeState.OriginalPrompt = $function:__GitBranchPrompt
+} else {
+    function global:prompt { __GitBranchPrompt }
+}
+
 Write-Host "✅ PowerShell aliases loaded!" -ForegroundColor Green
 Write-Host "💡 Tip: github-fetch / github-pull / github-commit / github-push / github-gh  |  github-help  |  gq-help" -ForegroundColor Cyan
 
