@@ -479,9 +479,25 @@ function github-commit { Invoke-GitHubProxy "github-commit.ps1" @args }
 function github-push { Invoke-GitHubProxy "github-push.ps1" @args }
 function github-gh { Invoke-GitHubProxy "github-gh.ps1" @args }
 
+# Unique prefixes: github-fetc → github-fetch (github-pu остаётся неоднозначным).
+$script:GitHubProxyCommands = @(
+    "github-fetch", "github-pull", "github-commit", "github-push", "github-gh", "github-help"
+)
+
+function Resolve-GitHubProxyCommandName {
+    param([Parameter(Mandatory = $true)][string]$Name)
+    if ($script:GitHubProxyCommands -contains $Name) { return $Name }
+    $hits = @($script:GitHubProxyCommands | Where-Object { $_ -like "$Name*" })
+    if ($hits.Count -eq 1) { return $hits[0] }
+    return $null
+}
+
+Set-Alias -Name github-fetc -Value github-fetch
+
 function github-help {
-    Write-Host "github-* — функции профиля, не PATH." -ForegroundColor Cyan
+    Write-Host "github-* — функции профиля, не PATH. Скрипты лежат в github-proxy/." -ForegroundColor Cyan
     Write-Host "  github-fetch / github-pull / github-commit / github-push / github-gh" -ForegroundColor White
+    Write-Host "  короткие префиксы: github-fetc → github-fetch (если имя однозначное)" -ForegroundColor White
     Write-Host ""
     Write-Host "«The term 'github-…' is not recognized» — сессия со старым профилем:" -ForegroundColor Yellow
     Write-Host '  . $PROFILE' -ForegroundColor White
@@ -499,23 +515,59 @@ function github-help {
 try {
     $ExecutionContext.InvokeCommand.CommandNotFoundAction = {
         param($CommandName, $EventArgs)
-        if ($CommandName -like "github-*") {
-            Write-Host ""
-            Write-Host "Команда '$CommandName' не в этой сессии (не PATH)." -ForegroundColor Yellow
-            Write-Host "Исправление:" -ForegroundColor Cyan
-            Write-Host '  . $PROFILE' -ForegroundColor White
-            Write-Host "Если Tip без этой команды:" -ForegroundColor Cyan
-            Write-Host "  cd C:\Project\terminal-configs\windows\powershell; .\install.ps1; . `$PROFILE" -ForegroundColor White
-            $hintRoot = $null
-            if (Get-Command Get-GitHubProxyHome -ErrorAction SilentlyContinue) {
-                $hintRoot = Get-GitHubProxyHome
-            }
-            if (-not $hintRoot) { $hintRoot = "C:\Project\terminal-configs\github-proxy" }
-            Write-Host "Напрямую:" -ForegroundColor Cyan
-            Write-Host "  & `"$hintRoot\$CommandName.ps1`"" -ForegroundColor White
-            Write-Host "Справка: github-help" -ForegroundColor Cyan
-            Write-Host ""
+        if ($CommandName -notlike "github-*") { return }
+
+        $resolved = $null
+        if (Get-Command Resolve-GitHubProxyCommandName -ErrorAction SilentlyContinue) {
+            $resolved = Resolve-GitHubProxyCommandName $CommandName
         }
+
+        if ($resolved) {
+            $cmd = Get-Command $resolved -ErrorAction SilentlyContinue
+            if (-not $cmd) {
+                $hintRoot = $null
+                if (Get-Command Get-GitHubProxyHome -ErrorAction SilentlyContinue) {
+                    $hintRoot = Get-GitHubProxyHome
+                }
+                if (-not $hintRoot) { $hintRoot = "C:\Project\terminal-configs\github-proxy" }
+                $scriptPath = Join-Path $hintRoot "$resolved.ps1"
+                if (Test-Path $scriptPath) {
+                    $cmd = Get-Command $scriptPath -ErrorAction SilentlyContinue
+                }
+            }
+            if ($cmd) {
+                if ($resolved -ne $CommandName) {
+                    Write-Host "→ $resolved" -ForegroundColor DarkGray
+                }
+                $EventArgs.Command = $cmd
+                return
+            }
+        }
+
+        $hits = @()
+        if ($script:GitHubProxyCommands) {
+            $hits = @($script:GitHubProxyCommands | Where-Object { $_ -like "$CommandName*" })
+        }
+        if ($hits.Count -gt 1) {
+            Write-Host "Неоднозначно: $($hits -join ', '). Допишите имя, например github-pull." -ForegroundColor Yellow
+            return
+        }
+
+        Write-Host ""
+        Write-Host "Команда '$CommandName' не в этой сессии (не PATH)." -ForegroundColor Yellow
+        Write-Host "Исправление:" -ForegroundColor Cyan
+        Write-Host '  . $PROFILE' -ForegroundColor White
+        Write-Host "Если Tip без этой команды:" -ForegroundColor Cyan
+        Write-Host "  cd C:\Project\terminal-configs\windows\powershell; .\install.ps1; . `$PROFILE" -ForegroundColor White
+        $hintRoot = $null
+        if (Get-Command Get-GitHubProxyHome -ErrorAction SilentlyContinue) {
+            $hintRoot = Get-GitHubProxyHome
+        }
+        if (-not $hintRoot) { $hintRoot = "C:\Project\terminal-configs\github-proxy" }
+        Write-Host "Напрямую:" -ForegroundColor Cyan
+        Write-Host "  & `"$hintRoot\github-fetch.ps1`"" -ForegroundColor White
+        Write-Host "Справка: github-help" -ForegroundColor Cyan
+        Write-Host ""
     }
 } catch {
     # PS без CommandNotFoundAction — достаточно github-help и . $PROFILE

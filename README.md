@@ -64,7 +64,7 @@ macOS: ветка обычно уже в prompt (Powerlevel10k). После пр
 
 | Команда | Что делает |
 |---|---|
-| `github-fetch` | fetch **каждого** remote этого репо (мёртвый URL пропускает); сразу печатает текущую ветку |
+| `github-fetch` | fetch **каждого** remote этого репо (мёртвый URL пропускает); сразу печатает текущую ветку. Однозначный префикс тоже работает: `github-fetc` → `github-fetch` |
 | `github-pull` | `git pull` текущей ветки с tracking (`origin` = GitHub) |
 | `github-commit` | commit только **staging**; одна строка в кавычках, много строк — без аргументов (Ctrl-D) или `-e` |
 | `github-push` | `git push -u origin HEAD` на **все** push-URL `origin` |

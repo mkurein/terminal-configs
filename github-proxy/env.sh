@@ -26,6 +26,7 @@ github_push() { "$GITHUB_PROXY_HOME/github-push.sh" "$@"; }
 github_gh() { "$GITHUB_PROXY_HOME/github-gh.sh" "$@"; }
 
 alias github-fetch=github_fetch
+alias github-fetc=github_fetch
 alias github-pull=github_pull
 alias github-commit=github_commit
 alias github-push=github_push
