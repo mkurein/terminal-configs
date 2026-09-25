@@ -9,31 +9,49 @@
 
 ---
 
-## Терминал: ветка и `. $PROFILE`
+## Терминал: Git-состояние в prompt и `. $PROFILE`
 
-PowerShell **сам** ветку не показывает. По умолчанию только путь:
+PowerShell **сам** ветку и изменения не показывает. По умолчанию только путь:
 
 ```text
 PS C:\Project\homelab-book>
 ```
 
-После установки профиля из `windows/powershell/` в git-репозитории будет:
+После установки профиля из `windows/powershell/` в git-репозитории prompt показывает ветку и локальное состояние:
 
 ```text
-PS C:\Project\homelab-book [main]>
+PS C:\Project\my-project [main S:2 M:3 D:1 ?:4 ahead:1]>
 ```
 
-`[main]` — текущая ветка **этого** каталога (homelab-book, Lite, terminal-configs, …), жёлтым. Не в git — как раньше, без скобок.
+| Маркер | Значение |
+|--------|----------|
+| ветка | текущая ветка этого каталога |
+| `S:N` | staged |
+| `M:N` | изменённые unstaged |
+| `D:N` | удалённые (unstaged) |
+| `?:N` | untracked |
+| `!:N` | конфликты merge/rebase |
+| `ahead:N` / `behind:N` | относительно upstream |
 
-**Уже открытая вкладка Cursor этого не видит.** Профиль читается один раз при старте окна; Cursor ещё и запоминает тогдашний `prompt`. Подхватить правки **в этой же** сессии:
+Цвета: чистая ветка — зелёный, есть изменения — жёлтый, конфликты — красный. Не в git — как раньше, без скобок. Prompt только читает локальный `git status` (без fetch/pull/push) и не портит `LASTEXITCODE`.
+
+**Новый терминал** читает профиль автоматически. **Уже открытая вкладка** Cursor/VS Code этого не видит: профиль и `prompt` снимаются при старте окна. После обновления профиля в уже открытом терминале:
 
 ```powershell
 . $PROFILE
 ```
 
-Или открыть новый терминал.
+Или просто открыть новый терминал.
 
-`$PROFILE` — путь к файлу профиля этого PowerShell (не команда и не PATH). Обычно `…\Documents\PowerShell\Microsoft.PowerShell_profile.ps1` (часто под OneDrive). Точка `.` — выполнить файл **здесь** (как `source ~/.zshrc`). Не ставит Git, не клонирует репо, не пушит. После правок `windows/powershell/Microsoft.PowerShell_profile.ps1` сначала `.\install.ps1`, потом снова `. $PROFILE`.
+`$PROFILE` — путь к файлу профиля **этого** PowerShell (не команда и не PATH). У PowerShell 5.1 и PowerShell 7 пути обычно разные (`WindowsPowerShell` vs `PowerShell`; часто под OneDrive). Точка `.` — выполнить файл **здесь** (как `source ~/.zshrc`). Не ставит Git, не клонирует репо, не пушит.
+
+`git pull` **сам** установленный профиль PowerShell не обновляет — только файлы в clone. На другом ПК после обновления репозитория:
+
+```powershell
+git pull --ff-only
+.\windows\powershell\install.ps1
+. $PROFILE
+```
 
 Проверка: `echo $PROFILE`. Если после точки в Tip нет `github-fetch` — профиль на диске старый, нужен `install.ps1`.
 
@@ -82,7 +100,7 @@ macOS: ветка обычно уже в prompt (Powerlevel10k). После пр
 . $PROFILE
 ```
 
-Зачем точка и что такое `$PROFILE` — в начале README, раздел «Терминал: ветка и `. $PROFILE`». То же самое чинит приглашение без `[ветка]` и «is not recognized». `github-fetch` / `github-commit` живут в профиле, не в PATH.
+Зачем точка и что такое `$PROFILE` — в начале README, раздел «Терминал: Git-состояние в prompt и `. $PROFILE`». То же самое чинит приглашение без `[ветка]` и «is not recognized». `github-fetch` / `github-commit` живут в профиле, не в PATH.
 
 Проверка: `echo $PROFILE` — какой файл; после точки в Tip должны быть все имена, включая `github-commit`. Если нет — профиль на диске старый:
 

@@ -579,35 +579,54 @@ function Show-GqHelp {
 }
 Set-Alias -Name gq-help -Value Show-GqHelp
 
-# Default PowerShell prompt is only "PS C:\path>" — no git branch.
+# Default PowerShell prompt is only "PS C:\path>" — no git branch/status.
 # Cursor/VS Code wraps Prompt at session start and keeps that snapshot;
 # after `. $PROFILE` we refresh OriginalPrompt so an already-open tab picks this up.
 function global:__GitBranchPrompt {
     $loc = $executionContext.SessionState.Path.CurrentLocation.Path
-    $git = ""
+    $gitSummary = ''
+    $savedExit = $global:LASTEXITCODE
+    $savedPreference = $ErrorActionPreference
     try {
-        $prevEap = $ErrorActionPreference
-        $ErrorActionPreference = "SilentlyContinue"
-        $prevNative = $null
-        if (Get-Variable -Name PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue) {
-            $prevNative = $PSNativeCommandUseErrorActionPreference
+        $ErrorActionPreference = 'SilentlyContinue'
+        if (Get-Variable PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue) {
             $PSNativeCommandUseErrorActionPreference = $false
         }
-        $inside = git rev-parse --is-inside-work-tree 2>$null
-        if ("$inside".Trim() -eq "true") {
-            $branch = (git --no-pager branch --show-current 2>$null | Out-String).Trim()
-            if (-not $branch) { $branch = "detached" }
+        # One local read; never refresh the index or contact remotes from the prompt.
+        $lines = @(git --no-optional-locks status --porcelain=v1 --branch --untracked-files=normal 2>$null)
+        if ($LASTEXITCODE -eq 0 -and $lines.Count -gt 0) {
+            $header = [string]$lines[0]
+            $branch = ($header -replace '^## ', '') -replace '\.\.\..*$', ''
+            $branch = $branch -replace '^(No commits yet on |Initial commit on )', ''
+            $staged = 0; $modified = 0; $deleted = 0; $untracked = 0; $conflicts = 0
+            foreach ($line in $lines) {
+                if ($line.Length -lt 2 -or $line.StartsWith('##')) { continue }
+                $xy = $line.Substring(0, 2)
+                if ($xy -eq '??') { $untracked++; continue }
+                if ($xy -in @('DD','AU','UD','UA','DU','AA','UU')) { $conflicts++; continue }
+                if ($xy[0] -ne ' ' -and $xy[0] -ne '?') { $staged++ }
+                if ($xy[1] -eq 'D') { $deleted++ }
+                elseif ($xy[1] -ne ' ' -and $xy[1] -ne '?') { $modified++ }
+            }
+            $parts = @($branch)
+            if ($staged) { $parts += "S:$staged" }
+            if ($modified) { $parts += "M:$modified" }
+            if ($deleted) { $parts += "D:$deleted" }
+            if ($untracked) { $parts += "?:$untracked" }
+            if ($conflicts) { $parts += "!:$conflicts" }
+            if ($header -match 'ahead (\d+)') { $parts += "ahead:$($Matches[1])" }
+            if ($header -match 'behind (\d+)') { $parts += "behind:$($Matches[1])" }
             $esc = [char]27
-            $git = " ${esc}[33m[$branch]${esc}[0m"
+            $color = if ($conflicts) { '31' } elseif ($staged + $modified + $deleted + $untracked) { '33' } else { '32' }
+            $gitSummary = " ${esc}[${color}m[$($parts -join ' ')]${esc}[0m"
         }
-        if ($null -ne $prevNative) {
-            $PSNativeCommandUseErrorActionPreference = $prevNative
-        }
-        $ErrorActionPreference = $prevEap
     } catch {
-        # never break the prompt
+        # Missing Git or a non-repository directory must never break the terminal.
+    } finally {
+        $ErrorActionPreference = $savedPreference
+        $global:LASTEXITCODE = $savedExit
     }
-    "PS $loc$git> "
+    "PS $loc$gitSummary> "
 }
 
 if ($Global:__VSCodeState -and $Global:__VSCodeState.ContainsKey("OriginalPrompt")) {
