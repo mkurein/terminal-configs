@@ -13,4 +13,7 @@ github_proxy_clear
 echo "Proxy variables cleared for this terminal session."
 echo "Running: git -c http.proxy= -c https.proxy= push -u origin HEAD"
 
-git -c http.proxy= -c https.proxy= push -u origin HEAD "$@"
+if ! git -c http.proxy= -c https.proxy= push -u origin HEAD "$@"; then
+  github_proxy_push_fail_hint
+  exit 1
+fi

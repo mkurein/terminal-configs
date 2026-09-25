@@ -157,6 +157,15 @@ github-commit -e    # $EDITOR
 
 Перед запуском: `git status` и `git branch --show-current`.
 
+Скрипт **сбрасывает** `HTTP(S)_PROXY` и пушит напрямую. Если без прокси `github.com:443` недоступен — нужен VPN / Tailscale exit node. Если GitHub прошёл, а Forgejo пишет `Could not resolve hostname forgejo-nas`, добейте зеркало:
+
+```bash
+GIT_SSH_COMMAND="ssh -o ConnectTimeout=25" \
+  git push ssh://git@100.64.0.12:2222/mxm/REPO.git HEAD:main
+```
+
+При ошибке `github-push` сам печатает это пояснение в конце вывода.
+
 `--force` в шаблоне нет. Свой force только так:
 
 ```powershell

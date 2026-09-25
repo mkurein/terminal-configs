@@ -33,6 +33,18 @@ function Clear-GitHubProxyEnv {
     Remove-Item Env:HTTP_PROXY, Env:HTTPS_PROXY, Env:ALL_PROXY, Env:NO_PROXY, Env:http_proxy, Env:https_proxy, Env:all_proxy, Env:no_proxy -ErrorAction SilentlyContinue
 }
 
+function Show-GitHubPushFailHint {
+    Write-Host ""
+    Write-Host "github-push не удался. Скрипт специально сбрасывает HTTP(S)_PROXY и пушит напрямую." -ForegroundColor Yellow
+    Write-Host "Если github.com:443 недоступен без прокси — включите VPN / Tailscale exit node и повторите." -ForegroundColor Yellow
+    Write-Host "Если GitHub прошёл, а Forgejo пишет «Could not resolve hostname forgejo-nas» — алиас" -ForegroundColor Yellow
+    Write-Host "не резолвится в этой сессии. Добейте зеркало по IP Tailscale (подставьте имя репо):" -ForegroundColor Yellow
+    Write-Host '  $env:GIT_SSH_COMMAND = "ssh -o ConnectTimeout=25"' -ForegroundColor White
+    Write-Host "  git push ssh://git@100.64.0.12:2222/mxm/REPO.git HEAD:main" -ForegroundColor White
+    Write-Host "Проверка remotes: git remote get-url --push --all origin" -ForegroundColor Cyan
+    Write-Host ""
+}
+
 function Assert-GitHubWorkTree {
     git rev-parse --is-inside-work-tree 2>$null | Out-Null
     if ($LASTEXITCODE -ne 0) {

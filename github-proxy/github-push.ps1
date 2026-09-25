@@ -13,3 +13,7 @@ Write-Host "Proxy variables cleared for this terminal session." -ForegroundColor
 Write-Host "Running: git -c http.proxy= -c https.proxy= push -u origin HEAD" -ForegroundColor Cyan
 
 git -c http.proxy= -c https.proxy= push -u origin HEAD @args
+if ($LASTEXITCODE -ne 0) {
+    Show-GitHubPushFailHint
+    exit $LASTEXITCODE
+}
