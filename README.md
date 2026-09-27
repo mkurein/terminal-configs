@@ -11,17 +11,34 @@
 
 ## Терминал: Git-состояние в prompt и `. $PROFILE`
 
+Один и тот же **локальный** git-summary в prompt на Windows (PowerShell) и macOS (zsh). Маркеры совпадают.
+
+### Windows (PowerShell)
+
 PowerShell **сам** ветку и изменения не показывает. По умолчанию только путь:
 
 ```text
 PS C:\Project\homelab-book>
 ```
 
-После установки профиля из `windows/powershell/` в git-репозитории prompt показывает ветку и локальное состояние:
+После установки профиля из `windows/powershell/` в git-репозитории:
 
 ```text
-PS C:\Project\my-project [main S:2 M:3 D:1 ?:4 ahead:1]>
+PS C:\Project\my-project [main S:2 M:3 D:1 ?:4 ahead:1]
 ```
+
+### macOS (zsh / Cursor / Ghostty / Alacritty)
+
+Тема oh-my-zsh `apple` сама даёт только `[main*]` (звёздочка = «грязно», без счётчиков).
+`terminal-configs` ставит `macos/zsh/git-prompt.zsh` → `~/.config/zsh/git-prompt.zsh` и подключает его из `aliases.zsh`. В git-репо:
+
+```text
+(mac_venv)  ~/Project/UDP_gRPC_COM_Lite/ [main S:1 M:3 ?:2 ahead:1]
+```
+
+Вне git — как раньше, без скобок. Отключить: `export TC_GIT_PROMPT=0` в `~/.zshrc`.
+
+### Маркеры (одинаковые на обеих ОС)
 
 | Маркер | Значение |
 |--------|----------|
@@ -33,33 +50,51 @@ PS C:\Project\my-project [main S:2 M:3 D:1 ?:4 ahead:1]>
 | `!:N` | конфликты merge/rebase |
 | `ahead:N` / `behind:N` | относительно upstream |
 
-Цвета: чистая ветка — зелёный, есть изменения — жёлтый, конфликты — красный. Не в git — как раньше, без скобок. Prompt только читает локальный `git status` (без fetch/pull/push) и не портит `LASTEXITCODE`.
+Цвета: чистая ветка — зелёный, есть изменения — жёлтый, конфликты — красный. Prompt только читает локальный `git status` (без fetch/pull/push) и не портит код выхода прошлой команды.
 
-**Новый терминал** читает профиль автоматически. **Уже открытая вкладка** Cursor/VS Code этого не видит: профиль и `prompt` снимаются при старте окна. После обновления профиля в уже открытом терминале:
+### Как подхватить в уже открытом терминале
+
+**Новый терминал** читает профиль / `~/.zshrc` сам. **Уже открытая вкладка** Cursor/VS Code помнит старый prompt.
+
+Windows:
 
 ```powershell
 . $PROFILE
+```
+
+macOS:
+
+```bash
+source ~/.zshrc
+# или только prompt:
+source ~/.config/zsh/git-prompt.zsh
 ```
 
 Или просто открыть новый терминал.
 
 `$PROFILE` — путь к файлу профиля **этого** PowerShell (не команда и не PATH). У PowerShell 5.1 и PowerShell 7 пути обычно разные (`WindowsPowerShell` vs `PowerShell`; часто под OneDrive). Точка `.` — выполнить файл **здесь** (как `source ~/.zshrc`). Не ставит Git, не клонирует репо, не пушит.
 
-`git pull` **сам** установленный профиль PowerShell не обновляет — только файлы в clone. На другом ПК после обновления репозитория:
+`git pull` **сам** установленный профиль не обновляет — только файлы в clone. После обновления репозитория:
 
 ```powershell
+# Windows
 git pull --ff-only
 .\windows\powershell\install.ps1
 . $PROFILE
 ```
 
-Проверка: `echo $PROFILE`. Если после точки в Tip нет `github-fetch` — профиль на диске старый, нужен `install.ps1`.
+```bash
+# macOS
+git pull --ff-only
+cd macos && ./install.sh
+source ~/.zshrc
+```
+
+Проверка Windows: `echo $PROFILE`. Если после точки в Tip нет `github-fetch` — профиль на диске старый, нужен `install.ps1`.
+
+Проверка macOS: в git-репо prompt должен показать `[ветка …]`, не только `[main*]`. Файлы: `~/.config/zsh/git-prompt.zsh` и `aliases.zsh`.
 
 `github-fetch` отдельно печатает `Current branch:` и `git status -sb` — это вывод команды, не приглашение.
-
-macOS: ветка обычно уже в prompt (Powerlevel10k). После правок zsh: `source ~/.zshrc`.
-
----
 
 ## Как работать с GitHub и Forgejo
 

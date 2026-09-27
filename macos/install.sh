@@ -86,10 +86,14 @@ if [[ -f "scripts/project-switcher.sh" ]]; then
     log_success "Productivity tools установлены"
 fi
 
-# Zsh aliases (если существует)
+# Zsh aliases + git-prompt (если существуют)
 if [[ -f "zsh/aliases.zsh" ]]; then
     cp zsh/aliases.zsh "$HOME/.config/zsh/aliases.zsh"
     log_success "Zsh aliases установлены"
+fi
+if [[ -f "zsh/git-prompt.zsh" ]]; then
+    cp zsh/git-prompt.zsh "$HOME/.config/zsh/git-prompt.zsh"
+    log_success "Zsh git-prompt установлен ([main S: M: ?:] как на Windows)"
 fi
 
 # Обновление путей в конфигах

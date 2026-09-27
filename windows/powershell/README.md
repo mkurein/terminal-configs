@@ -168,6 +168,8 @@ PS C:\Project\my-project [main S:2 M:3 D:1 ?:4 ahead:1]>
 
 Чистая ветка — зелёным, изменения — жёлтым, конфликты — красным. Новый терминал загружает профиль сам. Уже открытое окно Cursor/VS Code подхватит prompt только после `. $PROFILE` (или нового терминала).
 
+На **macOS** те же маркеры даёт `macos/zsh/git-prompt.zsh` (через `aliases.zsh`). См. корневой [`README.md`](../../README.md).
+
 `git pull` не копирует шаблон в `$PROFILE`. На другом ПК:
 
 ```powershell

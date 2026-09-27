@@ -69,7 +69,27 @@ cd macos
 | `scripts/start-vpn-manage-5050.sh` | `~/start-vpn-manage-5050.sh` | Прямой запуск 50/50 |
 | `scripts/open-alacritty-here.sh` | `~/open-alacritty-here.sh` | Открыть Alacritty в папке |
 | `scripts/open-alacritty-here-simple.sh` | `~/open-alacritty-here-simple.sh` | Упрощенная версия |
-| `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Алиасы (n=nvim) |
+| `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Алиасы (n=nvim, gs, github-*) |
+| `zsh/git-prompt.zsh` | `~/.config/zsh/git-prompt.zsh` | Git в prompt: `[main S: M: ?:]` как на Windows |
+
+## Git в prompt (как на Windows)
+
+Тема oh-my-zsh `apple` показывает только `[main*]`. После установки `git-prompt.zsh`:
+
+```text
+(mac_venv)  ~/Project/UDP_gRPC_COM_Lite/ [main S:1 M:3 ?:2 ahead:1]
+```
+
+Маркеры те же, что в PowerShell-профиле (`S`/`M`/`D`/`?`/`!`/`ahead`/`behind`). Подробности — корневой [README](../README.md), раздел «Терминал: Git-состояние в prompt».
+
+```bash
+# поставить / обновить
+cd ~/Project/terminal-configs/macos && ./install.sh
+source ~/.zshrc
+
+# отключить
+export TC_GIT_PROMPT=0
+```
 
 ## 🚀 Открыть Alacritty в текущей папке
 
@@ -580,11 +600,15 @@ cd macos
 
 ---
 
-**Версия**: 2.4 (`github-proxy`; терминал 2.2)
-**Дата**: 2026-09-18
+**Версия**: 2.5 (`github-proxy` + git-prompt; терминал 2.2)
+**Дата**: 2026-09-27
 **Платформа**: macOS
 
 ## 📋 Changelog
+
+### v2.5 (2026-09-27)
+- 🎨 zsh: git-prompt как на Windows — `[main S: M: D: ?: ahead:]` (`macos/zsh/git-prompt.zsh`)
+- 📚 Документация prompt: корневой README + этот файл; `install.sh` копирует `git-prompt.zsh`
 
 ### v2.4 (2026-09-18)
 - 🚀 zsh: `github-fetch` / `github-pull` / `github-commit` / `github-push` / `github-gh` через `github-proxy/env.sh`

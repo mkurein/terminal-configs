@@ -2,6 +2,23 @@ alias n=nvim
 
 # Note: Windows-specific aliases (like 'alias open=explorer.exe') are removed for macOS compatibility
 
+# Git summary in prompt (parity with windows/powershell): [main S:1 M:2 ?:3]
+# Lives next to this file; install.sh copies both into ~/.config/zsh/
+_tc_git_prompt=""
+_tc_aliases_dir=""
+if [[ -n "${(%):-%x}" ]]; then
+  _tc_aliases_dir="$(cd "$(dirname "${(%):-%x}")" 2>/dev/null && pwd)"
+fi
+for _f in \
+  "${_tc_aliases_dir:+$_tc_aliases_dir/git-prompt.zsh}" \
+  "$HOME/.config/zsh/git-prompt.zsh" \
+  "$HOME/Project/terminal-configs/macos/zsh/git-prompt.zsh"
+do
+  [ -n "$_f" ] && [ -f "$_f" ] && _tc_git_prompt="$_f" && break
+done
+[ -n "$_tc_git_prompt" ] && . "$_tc_git_prompt"
+unset _f _tc_git_prompt _tc_aliases_dir
+
 # ===== QUICK ALIASES =====
 alias c='clear'
 alias ..='cd ..'
