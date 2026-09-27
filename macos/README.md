@@ -32,8 +32,10 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 ### 2. Запустите установку
 
+Из **корня клона** `terminal-configs` (не из Lite и не из домашнего каталога наугад):
+
 ```bash
-cd macos
+cd ~/Project/terminal-configs/macos
 ./install.sh
 ```
 
@@ -83,9 +85,13 @@ cd macos
 Маркеры те же, что в PowerShell-профиле (`S`/`M`/`D`/`?`/`!`/`ahead`/`behind`). Подробности — корневой [README](../README.md), раздел «Терминал: Git-состояние в prompt».
 
 ```bash
-# поставить / обновить
-cd ~/Project/terminal-configs/macos && ./install.sh
-source ~/.zshrc
+# поставить / обновить (клон terminal-configs, не Lite)
+# Один раз на этом Mac; потом — только после git pull с новыми правками.
+# Перезапуск Cursor / Mac install повторять не нужно.
+cd ~/Project/terminal-configs
+git pull --ff-only
+cd macos && ./install.sh    # → ~/.config/zsh/aliases.zsh + git-prompt.zsh
+source ~/.zshrc             # из любой папки; только для уже открытой вкладки
 
 # отключить
 export TC_GIT_PROMPT=0
@@ -592,10 +598,10 @@ chmod +x ~/*.sh
 Чтобы обновить конфигурацию из репозитория:
 
 ```bash
-cd ~/terminal-configs-backup
-git pull
-cd macos
-./install.sh
+cd ~/Project/terminal-configs
+git pull --ff-only
+cd macos && ./install.sh
+source ~/.zshrc
 ```
 
 ---

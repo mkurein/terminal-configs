@@ -74,21 +74,41 @@ source ~/.config/zsh/git-prompt.zsh
 
 `$PROFILE` — путь к файлу профиля **этого** PowerShell (не команда и не PATH). У PowerShell 5.1 и PowerShell 7 пути обычно разные (`WindowsPowerShell` vs `PowerShell`; часто под OneDrive). Точка `.` — выполнить файл **здесь** (как `source ~/.zshrc`). Не ставит Git, не клонирует репо, не пушит.
 
-`git pull` **сам** установленный профиль не обновляет — только файлы в clone. После обновления репозитория:
+`git pull` **сам** установленный профиль не обновляет — только файлы в clone. Команды ниже — **из корня этого репозитория** `terminal-configs` (не из Lite / ApiHA / другого проекта).
+
+Типичные пути клона:
+
+| ОС | Корень `terminal-configs` |
+| --- | --- |
+| macOS | `~/Project/terminal-configs` |
+| Windows | `C:\Project\terminal-configs` |
 
 ```powershell
-# Windows
+# Windows — сначала перейти в клон terminal-configs
+cd C:\Project\terminal-configs
 git pull --ff-only
 .\windows\powershell\install.ps1
 . $PROFILE
 ```
 
 ```bash
-# macOS
+# macOS — сначала перейти в клон terminal-configs
+cd ~/Project/terminal-configs
 git pull --ff-only
-cd macos && ./install.sh
-source ~/.zshrc
+cd macos && ./install.sh    # скрипт лежит в …/terminal-configs/macos/install.sh
+source ~/.zshrc             # из любой папки; подхватывает ~/.config/zsh/
 ```
+
+`source ~/.zshrc` и `. $PROFILE` можно из **любого** каталога — они читают уже установленный профиль пользователя. `git pull` и `install.sh` / `install.ps1` — только из клона `terminal-configs`.
+
+**Как часто запускать**
+
+| Действие | Когда |
+| --- | --- |
+| `git pull` + `install.sh` / `install.ps1` | **Один раз на этом компьютере** при первой настройке; потом — только когда в `terminal-configs` появились новые правки и вы хотите их поставить |
+| `source ~/.zshrc` / `. $PROFILE` | Только в **уже открытой** вкладке терминала после install. Новый терминал / перезапуск Cursor / перезагрузка ПК подхватят профиль **сами** |
+
+После перезапуска Cursor или Mac **ничего из блока выше снова вводить не нужно**: zsh/PowerShell при старте читают уже установленные файлы (`~/.config/zsh/…` или `$PROFILE`).
 
 Проверка Windows: `echo $PROFILE`. Если после точки в Tip нет `github-fetch` — профиль на диске старый, нужен `install.ps1`.
 
