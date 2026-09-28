@@ -71,7 +71,7 @@ cd ~/Project/terminal-configs/macos
 | `scripts/start-vpn-manage-5050.sh` | `~/start-vpn-manage-5050.sh` | Прямой запуск 50/50 |
 | `scripts/open-alacritty-here.sh` | `~/open-alacritty-here.sh` | Открыть Alacritty в папке |
 | `scripts/open-alacritty-here-simple.sh` | `~/open-alacritty-here-simple.sh` | Упрощенная версия |
-| `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Алиасы (n=nvim, gs, github-*) |
+| `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Алиасы (n=nvim, gs, gbr/gsw, github-*) |
 | `zsh/git-prompt.zsh` | `~/.config/zsh/git-prompt.zsh` | Git в prompt: `[main S: M: ?:]` как на Windows |
 
 ## Git в prompt (как на Windows)
@@ -96,6 +96,50 @@ source ~/.zshrc             # из любой папки; только для у
 # отключить
 export TC_GIT_PROMPT=0
 ```
+
+## Работа с ветками (как на Windows)
+
+Если разработка идёт в отдельной ветке или в worktree агента, легко забыть,
+где вы сейчас. Текущая ветка всегда видна в prompt, а подробности даёт `gbr`.
+Команды те же, что в PowerShell-профиле; все определены в `zsh/aliases.zsh`.
+
+```bash
+gbr             # обзор: текущая ветка, число локальных/удалённых,
+                #   +впереди/-позади относительно main, upstream,
+                #   в какой папке (worktree) ветка открыта
+gsw             # переключиться: список с номерами, выбрать номер
+gsw feature-x   # переключиться на ветку
+gsw -           # вернуться в предыдущую ветку
+gnb feature-x   # создать ветку от текущей и перейти в неё
+gmain           # вернуться в main/master и сделать pull --ff-only
+gcmp [ветка]    # что есть в ветке сверх main: коммиты и файлы
+gbd feature-x   # удалить ветку, только если она влита (git branch -d)
+gclean          # удалить все влитые в main ветки (спросит подтверждение)
+gwt             # список worktree: какая ветка в какой папке
+```
+
+Пример `gbr`:
+
+```text
+Сейчас: main   (локальных: 3, удалённых: 2, основная: main)
+
+  claude/agent  +1 / -0 к main    2 hours ago   без upstream | открыта в ~/Project/repo-wt
+  feature-x     +2 / -0 к main    3 days ago    origin/feature-x ahead 1
+* main                            3 days ago    origin/main
+```
+
+Ветку, открытую в другом worktree, `gsw` не переключит (так устроен git). Чтобы
+посмотреть её код, нужно перейти в папку, которую показывает `gbr`. `gclean`
+такие ветки не трогает.
+
+**oh-my-zsh.** Git-плагин oh-my-zsh задаёт свои `gbr`, `gsw`, `gbd`, `gwt` и
+`gclean`. `aliases.zsh` снимает эти алиасы, поэтому его нужно подключать в
+`~/.zshrc` **после** `source $ZSH/oh-my-zsh.sh`. Иначе oh-my-zsh вернёт свои
+версии. Проверка: `whence -w gbr` должна показать `gbr: function`. Обратите
+внимание: `gclean` из oh-my-zsh был `git clean -id` (удаление неотслеживаемых
+файлов), а здесь он удаляет влитые ветки.
+
+Краткая таблица всех алиасов — [ALIASES_MACBOOK_CHEATSHEET_RU.md](../ALIASES_MACBOOK_CHEATSHEET_RU.md).
 
 ## 🚀 Открыть Alacritty в текущей папке
 
