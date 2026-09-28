@@ -173,12 +173,12 @@ wsl --set-default Debian
 
 ---
 
-## Работа с ветками (PowerShell)
+## Работа с ветками (PowerShell и WSL)
 
 Если разработка идёт в отдельной ветке или в worktree агента, легко забыть,
 где вы сейчас. Текущая ветка всегда видна в prompt, а подробности даёт `gbr`.
-Команды определены в `powershell/Microsoft.PowerShell_profile.ps1`; те же самые
-есть на macOS в `macos/zsh/aliases.zsh`.
+Команды одинаковые в PowerShell (`powershell/Microsoft.PowerShell_profile.ps1`),
+в WSL (`zsh/aliases.zsh`) и на macOS (`macos/zsh/aliases.zsh`).
 
 ```powershell
 gbr             # обзор: текущая ветка, число локальных/удалённых,
