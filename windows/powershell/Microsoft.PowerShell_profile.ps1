@@ -18,6 +18,11 @@ function ll { Get-ChildItem | Format-Table -AutoSize }
 function la { Get-ChildItem -Force -File | Format-Table -AutoSize }
 
 # ===== GIT SHORTCUTS =====
+# gl/gc/gp — встроенные алиасы PowerShell (Get-Location/Get-Content/Get-ItemProperty).
+# Алиас сильнее функции, поэтому без удаления git-версии ниже никогда не вызываются.
+foreach ($__builtin in 'gl', 'gc', 'gp') {
+    if (Test-Path "Alias:$__builtin") { Remove-Item "Alias:$__builtin" -Force -ErrorAction SilentlyContinue }
+}
 function gs { git status }
 function ga { git add . }
 function gc { param([string]$message) git commit -m $message }
@@ -39,6 +44,166 @@ function gb {
 }
 function gba { git branch -a }
 function gbv { git branch -v }
+
+# ===== GIT BRANCHES =====
+# Когда разработка идёт в отдельной ветке (или в worktree агента), легко забыть,
+# где ты сейчас. gbr — обзор всех веток разом, остальное — переключение и уборка.
+
+# Основная ветка репозитория: origin/HEAD, иначе main, иначе master.
+function Get-GitMainBranch {
+    $ref = git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>$null
+    if ($ref) { return ($ref -replace '^origin/', '') }
+    foreach ($name in 'main', 'master') {
+        git show-ref --verify --quiet "refs/heads/$name" 2>$null
+        if ($LASTEXITCODE -eq 0) { return $name }
+    }
+    return $null
+}
+
+# Локальные ветки: имя, дата последнего коммита, upstream, путь worktree.
+function Get-GitLocalBranches {
+    $fmt = '%(HEAD)|%(refname:short)|%(committerdate:relative)|%(upstream:short)|%(upstream:track,nobracket)|%(worktreepath)|%(subject)'
+    git for-each-ref --sort=-committerdate --format=$fmt refs/heads 2>$null | ForEach-Object {
+        $f = $_ -split '\|', 7
+        [pscustomobject]@{
+            Current  = $f[0] -eq '*'
+            Name     = $f[1]
+            Age      = $f[2]
+            Upstream = $f[3]
+            Track    = $f[4]
+            Worktree = $f[5]
+            Subject  = $f[6]
+        }
+    }
+}
+
+# gbr — где я и какие ветки есть: текущая, счётчики, отставание/опережение от main,
+# в какой папке (worktree) ветка открыта.
+function gbr {
+    git rev-parse --git-dir *> $null
+    if ($LASTEXITCODE -ne 0) { Write-Host "Не git-репозиторий" -ForegroundColor Red; return }
+
+    $main = Get-GitMainBranch
+    $branches = @(Get-GitLocalBranches)
+    $remoteCount = @(git for-each-ref --format='%(refname:short)' refs/remotes 2>$null |
+        Where-Object { $_ -notmatch '/HEAD$' -and $_ -match '/' }).Count
+    $here = (git rev-parse --show-toplevel 2>$null) -replace '/', '\'
+    $current = git branch --show-current 2>$null
+    if (-not $current) { $current = "(detached HEAD $(git rev-parse --short HEAD 2>$null))" }
+
+    Write-Host ""
+    Write-Host "Сейчас: " -NoNewline
+    $curColor = if ($main -and $current -eq $main) { 'Yellow' } else { 'Green' }
+    Write-Host $current -ForegroundColor $curColor -NoNewline
+    Write-Host "   (локальных: $($branches.Count), удалённых: $remoteCount, основная: $main)" -ForegroundColor DarkGray
+    Write-Host ""
+
+    $width = ($branches | ForEach-Object { $_.Name.Length } | Measure-Object -Maximum).Maximum
+    foreach ($b in $branches) {
+        $mark = if ($b.Current) { '*' } else { ' ' }
+        $vsMain = ''
+        if ($main -and $b.Name -ne $main) {
+            $counts = git rev-list --left-right --count "$main...$($b.Name)" 2>$null
+            if ($counts -match '^(\d+)\s+(\d+)$') {
+                $behind = [int]$Matches[1]; $ahead = [int]$Matches[2]
+                $vsMain = if ($ahead -eq 0) { "влита в $main" } else { "+$ahead / -$behind к $main" }
+            }
+        }
+        $line = "{0} {1}  {2,-22} {3,-18}" -f $mark, $b.Name.PadRight($width), $vsMain, $b.Age
+        $color = if ($b.Current) { 'Green' } elseif ($vsMain -like 'влита*') { 'DarkGray' } else { 'White' }
+        Write-Host $line -ForegroundColor $color -NoNewline
+
+        $extra = @()
+        if ($b.Upstream) {
+            $extra += if ($b.Track) { "$($b.Upstream) $($b.Track)" } else { $b.Upstream }
+        } else {
+            $extra += 'без upstream'
+        }
+        $wt = ($b.Worktree -replace '/', '\')
+        if ($wt -and $wt -ne $here) { $extra += "открыта в $wt" }
+        Write-Host ("  " + ($extra -join ' | ')) -ForegroundColor DarkGray
+    }
+    Write-Host ""
+}
+
+# gsw [ветка] — переключиться. Без аргумента — выбор по номеру. "gsw -" — предыдущая.
+function gsw {
+    param([string]$branch)
+    if (-not $branch) {
+        $branches = @(Get-GitLocalBranches)
+        if (-not $branches) { Write-Host "Нет веток (не git-репозиторий?)" -ForegroundColor Red; return }
+        for ($i = 0; $i -lt $branches.Count; $i++) {
+            $b = $branches[$i]
+            $mark = if ($b.Current) { '*' } else { ' ' }
+            $color = if ($b.Current) { 'Green' } else { 'White' }
+            Write-Host ("{0,3}) {1} {2}   {3}" -f ($i + 1), $mark, $b.Name, $b.Age) -ForegroundColor $color
+        }
+        $choice = Read-Host "Номер ветки (Enter — отмена)"
+        if (-not $choice) { return }
+        $idx = 0
+        if (-not [int]::TryParse($choice, [ref]$idx) -or $idx -lt 1 -or $idx -gt $branches.Count) {
+            Write-Host "Нет такого номера" -ForegroundColor Red; return
+        }
+        $branch = $branches[$idx - 1].Name
+    }
+    git switch $branch
+}
+
+# gnb <ветка> — создать новую ветку от текущей и перейти в неё.
+function gnb {
+    param([Parameter(Mandatory)][string]$branch)
+    git switch -c $branch
+}
+
+# gmain — вернуться в основную ветку (main/master) и подтянуть её (только fast-forward).
+function gmain {
+    $main = Get-GitMainBranch
+    if (-not $main) { Write-Host "Не нашёл main/master" -ForegroundColor Red; return }
+    git switch $main
+    if ($LASTEXITCODE -eq 0 -and (git rev-parse --abbrev-ref '@{u}' 2>$null)) { git pull --ff-only }
+}
+
+# gcmp [ветка] — что в ветке есть сверх main: коммиты и затронутые файлы.
+function gcmp {
+    param([string]$branch)
+    $main = Get-GitMainBranch
+    if (-not $branch) { $branch = git branch --show-current }
+    if ($branch -eq $main) { Write-Host "Вы в $main — укажите ветку: gcmp <ветка>" -ForegroundColor Yellow; return }
+    Write-Host "Коммиты в $branch, которых нет в ${main}:" -ForegroundColor Cyan
+    git log --oneline --decorate "$main..$branch"
+    Write-Host ""
+    Write-Host "Файлы (${main}...$branch):" -ForegroundColor Cyan
+    git diff --stat "$main...$branch"
+}
+
+# gbd <ветка> — удалить локальную ветку, только если она уже влита (git branch -d).
+function gbd {
+    param([Parameter(Mandatory)][string]$branch)
+    git branch -d $branch
+}
+
+# gclean — удалить локальные ветки, уже влитые в main (с подтверждением).
+# Ветки, открытые в других worktree, и текущую не трогает.
+function gclean {
+    $main = Get-GitMainBranch
+    if (-not $main) { Write-Host "Не нашёл main/master" -ForegroundColor Red; return }
+    $merged = @(Get-GitLocalBranches | Where-Object {
+        -not $_.Current -and -not $_.Worktree -and $_.Name -ne $main -and $_.Name -notin 'main', 'master'
+    } | Where-Object {
+        git merge-base --is-ancestor $_.Name $main 2>$null
+        $LASTEXITCODE -eq 0
+    })
+    if (-not $merged) { Write-Host "Влитых веток для удаления нет" -ForegroundColor Green; return }
+    Write-Host "Влиты в $main и будут удалены:" -ForegroundColor Yellow
+    $merged | ForEach-Object { Write-Host "  $($_.Name)   $($_.Age)" }
+    $answer = Read-Host "Удалить? (y/N)"
+    if ($answer -in 'y', 'Y', 'д', 'Д') {
+        $merged | ForEach-Object { git branch -d $_.Name }
+    }
+}
+
+# gwt — список worktree: в какой папке какая ветка открыта.
+function gwt { git worktree list }
 
 # ===== WINDOWS INTEGRATION =====
 function open { param([string]$path = ".") explorer.exe $path }
@@ -719,5 +884,5 @@ $__localProfile = Join-Path (Split-Path -Parent $PROFILE) 'profile.local.ps1'
 if (Test-Path $__localProfile) { . $__localProfile }
 
 Write-Host "✅ PowerShell aliases loaded!" -ForegroundColor Green
-Write-Host "💡 Tip: github-fetch / github-pull / github-commit / github-push / github-gh  |  github-help  |  gq-help  |  mesh-st  |  exit-ip" -ForegroundColor Cyan
+Write-Host "💡 Tip: github-fetch / github-pull / github-commit / github-push / github-gh  |  github-help  |  gq-help  |  gbr (ветки)  |  mesh-st  |  exit-ip" -ForegroundColor Cyan
 

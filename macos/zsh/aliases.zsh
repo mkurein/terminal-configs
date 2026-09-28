@@ -38,6 +38,142 @@ alias gb='git branch'              # локальные ветки
 alias gba='git branch -a'         # все ветки (локальные + удалённые)
 alias gbv='git branch -v'         # ветки с последним коммитом
 
+# ===== GIT BRANCHES (parity with windows/powershell) =====
+# Когда разработка идёт в отдельной ветке (или в worktree агента), легко забыть,
+# где ты сейчас. gbr — обзор всех веток разом, остальное — переключение и уборка.
+# git-плагин oh-my-zsh задаёт одноимённые алиасы (gbr, gsw, gbd, gwt, gclean);
+# алиас сильнее функции, поэтому снимаем их перед определением.
+for _a in gbr gsw gnb gmain gcmp gbd gclean gwt; do
+  unalias "$_a" 2>/dev/null
+done
+unset _a
+
+# Основная ветка репозитория: origin/HEAD, иначе main, иначе master.
+function _tc_main_branch {
+  local ref name
+  ref=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null)
+  if [ -n "$ref" ]; then echo "${ref#origin/}"; return; fi
+  for name in main master; do
+    git show-ref --verify --quiet "refs/heads/$name" && { echo "$name"; return; }
+  done
+}
+
+# gbr — где я и какие ветки есть: текущая, счётчики, отставание/опережение от main,
+# в какой папке (worktree) ветка открыта.
+function gbr {
+  git rev-parse --git-dir >/dev/null 2>&1 || { echo "Не git-репозиторий"; return 1; }
+  local main cur here nlocal nremote width
+  main=$(_tc_main_branch)
+  cur=$(git branch --show-current 2>/dev/null)
+  [ -n "$cur" ] || cur="(detached HEAD $(git rev-parse --short HEAD))"
+  here=$(git rev-parse --show-toplevel)
+  nlocal=$(git for-each-ref --format='x' refs/heads | wc -l | tr -d ' ')
+  nremote=$(git for-each-ref --format='%(refname:short)' refs/remotes | grep '/' | grep -vc '/HEAD$')
+  width=$(git for-each-ref --format='%(refname:short)' refs/heads | awk '{ if (length($0) > m) m = length($0) } END { print m + 0 }')
+
+  local g='\033[32m' y='\033[33m' dim='\033[90m' r='\033[0m' curc
+  curc=$g; [ "$cur" = "$main" ] && curc=$y
+  printf "\nСейчас: ${curc}%s${r}   ${dim}(локальных: %s, удалённых: %s, основная: %s)${r}\n\n" \
+    "$cur" "$nlocal" "$nremote" "$main"
+
+  local head name age up track wt vs counts ahead behind color extra
+  git for-each-ref --sort=-committerdate \
+    --format='%(HEAD)|%(refname:short)|%(committerdate:relative)|%(upstream:short)|%(upstream:track,nobracket)|%(worktreepath)' \
+    refs/heads |
+  while IFS='|' read -r head name age up track wt; do
+    vs=""
+    if [ -n "$main" ] && [ "$name" != "$main" ]; then
+      counts=$(git rev-list --left-right --count "$main...$name" 2>/dev/null)
+      behind=${counts%%[[:space:]]*}; ahead=${counts##*[[:space:]]}
+      if [ "$ahead" = "0" ]; then vs="влита в $main"; else vs="+$ahead / -$behind к $main"; fi
+    fi
+    color=$r
+    [ "$head" = "*" ] && color=$g
+    [ "$head" != "*" ] && [ "${vs#влита}" != "$vs" ] && color=$dim
+    if [ -n "$up" ]; then extra="$up${track:+ $track}"; else extra="без upstream"; fi
+    [ -n "$wt" ] && [ "$wt" != "$here" ] && extra="$extra | открыта в $wt"
+    printf "${color}%s %-${width}s  %-22s %-18s${r}  ${dim}%s${r}\n" \
+      "${head:- }" "$name" "$vs" "$age" "$extra"
+  done
+  echo
+}
+
+# gsw [ветка] — переключиться. Без аргумента — выбор по номеру. "gsw -" — предыдущая.
+function gsw {
+  if [ -n "$1" ]; then git switch "$1"; return; fi
+  local list n choice picked
+  list=$(git for-each-ref --sort=-committerdate --format='%(HEAD) %(refname:short)|%(committerdate:relative)' refs/heads 2>/dev/null)
+  [ -n "$list" ] || { echo "Нет веток (не git-репозиторий?)"; return 1; }
+  printf '%s\n' "$list" | awk -F'|' '{ printf "%3d) %s   %s\n", NR, $1, $2 }'
+  n=$(printf '%s\n' "$list" | wc -l | tr -d ' ')
+  printf "Номер ветки (Enter — отмена): "
+  read -r choice
+  [ -n "$choice" ] || return 0
+  case "$choice" in *[!0-9]*) echo "Нет такого номера"; return 1 ;; esac
+  if [ "$choice" -lt 1 ] || [ "$choice" -gt "$n" ]; then echo "Нет такого номера"; return 1; fi
+  picked=$(printf '%s\n' "$list" | sed -n "${choice}p" | cut -d'|' -f1 | cut -c3-)
+  git switch "$picked"
+}
+
+# gnb <ветка> — создать новую ветку от текущей и перейти в неё.
+function gnb {
+  [ -n "$1" ] || { echo "Использование: gnb <ветка>"; return 1; }
+  git switch -c "$1"
+}
+
+# gmain — вернуться в основную ветку (main/master) и подтянуть её (только fast-forward).
+function gmain {
+  local main
+  main=$(_tc_main_branch)
+  [ -n "$main" ] || { echo "Не нашёл main/master"; return 1; }
+  git switch "$main" || return
+  git rev-parse --abbrev-ref '@{u}' >/dev/null 2>&1 && git pull --ff-only
+}
+
+# gcmp [ветка] — что в ветке есть сверх main: коммиты и затронутые файлы.
+function gcmp {
+  local main br
+  main=$(_tc_main_branch)
+  br=${1:-$(git branch --show-current)}
+  if [ "$br" = "$main" ]; then echo "Вы в $main — укажите ветку: gcmp <ветка>"; return 1; fi
+  echo "Коммиты в $br, которых нет в $main:"
+  git --no-pager log --oneline --decorate "$main..$br"
+  echo
+  echo "Файлы ($main...$br):"
+  git --no-pager diff --stat "$main...$br"
+}
+
+# gbd <ветка> — удалить локальную ветку, только если она уже влита (git branch -d).
+function gbd {
+  [ -n "$1" ] || { echo "Использование: gbd <ветка>"; return 1; }
+  git branch -d "$1"
+}
+
+# gclean — удалить локальные ветки, уже влитые в main (с подтверждением).
+# Ветки, открытые в других worktree, и текущую не трогает.
+function gclean {
+  local main merged answer head name age wt
+  main=$(_tc_main_branch)
+  [ -n "$main" ] || { echo "Не нашёл main/master"; return 1; }
+  merged=$(git for-each-ref --format='%(HEAD)|%(refname:short)|%(committerdate:relative)|%(worktreepath)' refs/heads |
+    while IFS='|' read -r head name age wt; do
+      [ "$head" = "*" ] || [ -n "$wt" ] && continue
+      case "$name" in "$main"|main|master) continue ;; esac
+      git merge-base --is-ancestor "$name" "$main" 2>/dev/null && printf '%s|%s\n' "$name" "$age"
+    done)
+  [ -n "$merged" ] || { echo "Влитых веток для удаления нет"; return 0; }
+  echo "Влиты в $main и будут удалены:"
+  printf '%s\n' "$merged" | awk -F'|' '{ printf "  %s   %s\n", $1, $2 }'
+  printf "Удалить? (y/N): "
+  read -r answer
+  case "$answer" in
+    y|Y|д|Д) printf '%s\n' "$merged" | cut -d'|' -f1 | while read -r name; do git branch -d "$name"; done ;;
+  esac
+}
+
+# gwt — список worktree: в какой папке какая ветка открыта.
+function gwt { git worktree list; }
+
 # Docker shortcuts (если используете)
 alias d='docker'
 alias dc='docker-compose'
