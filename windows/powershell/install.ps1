@@ -54,6 +54,28 @@ if ($executionPolicy -eq "Restricted") {
     }
 }
 
+# Модули автодополнения.
+# posh-git   — Tab по веткам, remote'ам и файлам git (аналог git-плагина oh-my-zsh)
+# PSReadLine — подсказки из истории и меню вариантов по Tab
+# Без них профиль загрузится, но подсказок не будет.
+Write-Host ""
+Write-Host "🔍 Проверка модулей автодополнения..." -ForegroundColor Cyan
+foreach ($moduleName in @('posh-git', 'PSReadLine')) {
+    $installed = Get-Module -ListAvailable -Name $moduleName | Select-Object -First 1
+    if ($installed) {
+        Write-Host "✓ $moduleName уже есть ($($installed.Version))" -ForegroundColor Green
+    } else {
+        Write-Host "… ставлю $moduleName из PSGallery" -ForegroundColor Yellow
+        try {
+            Install-Module -Name $moduleName -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
+            Write-Host "✓ $moduleName установлен" -ForegroundColor Green
+        } catch {
+            Write-Host "✗ Не удалось поставить ${moduleName}: $_" -ForegroundColor Red
+            Write-Host "  Вручную: Install-Module $moduleName -Scope CurrentUser -Force" -ForegroundColor Yellow
+        }
+    }
+}
+
 # Загрузка профиля
 Write-Host ""
 Write-Host "🔄 Загрузка профиля..." -ForegroundColor Cyan

@@ -180,6 +180,81 @@ git pull --ff-only
 
 `$PROFILE` у PowerShell 5.1 и 7 обычно разный. Подробности — в начале корневого [`README.md`](../../README.md) (раздел «Терминал: Git-состояние в prompt и `. $PROFILE`»).
 
+### Автодополнение и подсказки
+
+На macOS подсказки по веткам и файлам даёт **oh-my-zsh** — он ставится отдельно
+от этого репозитория, поэтому «на Маке есть, на Windows нет». В PowerShell
+аналога по умолчанию нет, и его нужно включать явно. С 2026-09-28 это делает
+профиль, а модули доставляет `install.ps1`.
+
+| Что нужно | macOS | Windows |
+| --- | --- | --- |
+| Tab по веткам, remote'ам и файлам git | git-плагин oh-my-zsh + `compinit` | **posh-git** |
+| Подсказка из истории серым | `zsh-autosuggestions` | **PSReadLine**, `PredictionSource History` |
+| Меню вариантов по Tab | меню zsh | `Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete` |
+
+Как это работает после установки:
+
+- `git checkout ` + **Tab** — перебор веток; повторный Tab листает меню.
+- `git add ` + **Tab** — перебор изменённых файлов.
+- начать команду и нажать **↑** — поиск по истории **с учётом набранного**
+  префикса, а не просто предыдущая команда.
+- серая подсказка справа — продолжение из истории, принимается стрелкой **→**.
+
+Порядок в профиле важен: `Import-Module posh-git` стоит **до** секции prompt.
+posh-git при импорте перехватывает `prompt` на себя, а наш
+`__GitBranchPrompt` определяется ниже и возвращает приглашение с `[branch]`
+обратно. Если поменять местами — пропадёт привычный вид строки.
+
+Проверка, что всё на месте:
+
+```powershell
+Get-Module -ListAvailable posh-git, PSReadLine | Select-Object Name, Version
+Get-PSReadLineOption | Select-Object PredictionSource, PredictionViewStyle
+```
+
+Если `PredictionSource` = `None` или posh-git не найден — профиль на диске
+старый, нужен `install.ps1` и `. $PROFILE`.
+
+Подсказка показывается инлайном (`InlineView`). Если хочется списком под
+строкой — `Set-PSReadLineOption -PredictionViewStyle ListView`.
+
+### Локальные переопределения: `profile.local.ps1`
+
+Репозиторий публичный, поэтому имён узлов, подсетей и приватных путей в нём
+нет. Всё, что специфично для конкретной машины, живёт в отдельном файле рядом
+с профилем:
+
+```powershell
+# путь: (Split-Path $PROFILE)\profile.local.ps1
+$global:MeshExitHomeNode = 'имя-домашнего-узла'
+$global:MeshExitVpsNode  = 'имя-vps-узла'
+$global:MeshLanLabel     = '192.168.0.0/24'
+```
+
+Профиль подхватывает этот файл в самом конце, поэтому переопределения
+перекрывают значения по умолчанию. Функции `exit-home` / `exit-vps` читают
+переменные в момент вызова, так что порядок загрузки роли не играет.
+
+Главное свойство: **`install.ps1` этот файл не трогает.** Можно сколько угодно
+раз обновлять профиль из репозитория, локальные настройки останутся.
+
+Что удобно туда класть: реальные имена узлов mesh, личные алиасы, пути к
+рабочим проектам, переменные окружения конкретной машины.
+
+Настройка новой машины целиком:
+
+```powershell
+git clone https://github.com/mkurein/terminal-configs
+cd terminal-configs\windows\powershell
+.\install.ps1
+notepad (Join-Path (Split-Path $PROFILE) 'profile.local.ps1')   # свои значения
+. $PROFILE
+```
+
+Без `profile.local.ps1` всё работает, просто `exit-home` / `exit-vps` будут
+ссылаться на несуществующие узлы-плейсхолдеры.
+
 ## ⚠️ Важные замечания
 
 1. **WSL команды**: Некоторые команды (`ps`, `backup`, `sync`, `devenv`, `clean`) работают через WSL, поэтому требуют установленного WSL.

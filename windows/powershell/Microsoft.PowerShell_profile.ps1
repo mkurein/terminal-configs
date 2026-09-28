@@ -579,6 +579,72 @@ function Show-GqHelp {
 }
 Set-Alias -Name gq-help -Value Show-GqHelp
 
+# ===== MESH / EXIT NODE (Tailscale) =====
+# Имена узлов и подсеть у каждой машины свои. Значения ниже — плейсхолдеры.
+# Реальные задаются в profile.local.ps1 рядом с профилем: он подхватывается
+# в конце этого файла, в репозиторий не входит и install.ps1 его не трогает.
+if (-not $global:MeshExitHomeNode) { $global:MeshExitHomeNode = 'home-exit-node' }
+if (-not $global:MeshExitVpsNode)  { $global:MeshExitVpsNode  = 'vps-exit-node' }
+if (-not $global:MeshLanLabel)     { $global:MeshLanLabel     = '192.168.0.0/24' }
+
+function mesh-on {
+    tailscale up
+    Write-Host "Mesh: up" -ForegroundColor Green
+}
+function mesh-off {
+    tailscale down
+    Write-Host "Mesh: down" -ForegroundColor Yellow
+}
+function mesh-st { tailscale status }
+function mesh-lan {
+    tailscale set --accept-routes
+    Write-Host "Accept routes: локальная сеть $global:MeshLanLabel" -ForegroundColor Green
+}
+function exit-home {
+    tailscale set --exit-node=$global:MeshExitHomeNode --exit-node-allow-lan-access
+    Write-Host "Exit node: $global:MeshExitHomeNode" -ForegroundColor Green
+    exit-ip
+}
+function exit-vps {
+    # --exit-node-allow-lan-access здесь обязателен. Без него Tailscale ставит
+    # на текущую локальную сеть маршрут с метрикой 0 и утягивает её в туннель:
+    # перестаёт открываться даже собственный шлюз, и это выглядит как отказ
+    # железа, а не как настройка VPN.
+    tailscale set --exit-node=$global:MeshExitVpsNode --exit-node-allow-lan-access
+    Write-Host "Exit node: $global:MeshExitVpsNode" -ForegroundColor Cyan
+    exit-ip
+}
+function exit-off {
+    tailscale set --exit-node=
+    Write-Host "Exit node выключен (прямой выход)" -ForegroundColor Yellow
+    exit-ip
+}
+function exit-ip {
+    $ip = curl.exe -s --max-time 10 https://api.ipify.org
+    if ($ip) { Write-Host "Публичный IP: $ip" -ForegroundColor White }
+    else { Write-Host "Не удалось определить IP (нет интернета?)" -ForegroundColor Red }
+}
+
+# ===== АВТОДОПОЛНЕНИЕ И ПОДСКАЗКИ =====
+# Аналог того, что на macOS даёт oh-my-zsh: Tab по веткам и подсказки из истории.
+#   posh-git   -> Tab по веткам, remote'ам и файлам git
+#   PSReadLine -> серые подсказки из истории, меню вариантов по Tab
+# Модули ставит install.ps1. Импорт стоит ДО секции prompt: posh-git при
+# импорте перехватывает prompt, а наш __GitBranchPrompt определяется ниже и
+# возвращает приглашение с [branch] обратно.
+if (Get-Module -ListAvailable -Name posh-git) {
+    Import-Module posh-git -ErrorAction SilentlyContinue
+}
+try {
+    Set-PSReadLineOption -PredictionSource History -ErrorAction Stop
+    Set-PSReadLineOption -PredictionViewStyle InlineView -ErrorAction Stop
+    Set-PSReadLineKeyHandler -Key Tab       -Function MenuComplete
+    Set-PSReadLineKeyHandler -Key UpArrow   -Function HistorySearchBackward
+    Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+} catch {
+    # Старый PSReadLine (<2.1) не знает PredictionSource — не ломаем профиль.
+}
+
 # Default PowerShell prompt is only "PS C:\path>" — no git branch/status.
 # Cursor/VS Code wraps Prompt at session start and keeps that snapshot;
 # after `. $PROFILE` we refresh OriginalPrompt so an already-open tab picks this up.
@@ -635,6 +701,13 @@ if ($Global:__VSCodeState -and $Global:__VSCodeState.ContainsKey("OriginalPrompt
     function global:prompt { __GitBranchPrompt }
 }
 
+# ===== ЛОКАЛЬНЫЕ ПЕРЕОПРЕДЕЛЕНИЯ =====
+# profile.local.ps1 лежит рядом с $PROFILE, в репозиторий не входит и не
+# перезаписывается install.ps1. Туда — всё, что специфично для машины:
+# реальные имена узлов mesh, приватные пути, личные алиасы.
+$__localProfile = Join-Path (Split-Path -Parent $PROFILE) 'profile.local.ps1'
+if (Test-Path $__localProfile) { . $__localProfile }
+
 Write-Host "✅ PowerShell aliases loaded!" -ForegroundColor Green
-Write-Host "💡 Tip: github-fetch / github-pull / github-commit / github-push / github-gh  |  github-help  |  gq-help" -ForegroundColor Cyan
+Write-Host "💡 Tip: github-fetch / github-pull / github-commit / github-push / github-gh  |  github-help  |  gq-help  |  mesh-st  |  exit-ip" -ForegroundColor Cyan
 
