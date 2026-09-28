@@ -635,14 +635,24 @@ function exit-ip {
 if (Get-Module -ListAvailable -Name posh-git) {
     Import-Module posh-git -ErrorAction SilentlyContinue
 }
+
+# Подсказки из истории. Недоступны, когда вывод перенаправлен или консоль без
+# virtual terminal processing (запуск скриптом, CI, вывод в файл) — это штатно.
 try {
     Set-PSReadLineOption -PredictionSource History -ErrorAction Stop
     Set-PSReadLineOption -PredictionViewStyle InlineView -ErrorAction Stop
-    Set-PSReadLineKeyHandler -Key Tab       -Function MenuComplete
-    Set-PSReadLineKeyHandler -Key UpArrow   -Function HistorySearchBackward
-    Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 } catch {
-    # Старый PSReadLine (<2.1) не знает PredictionSource — не ломаем профиль.
+    # Предсказания не поддержаны этим хостом — не ломаем профиль.
+}
+
+# Клавиши настраиваются отдельным try: они работают и там, где предсказания
+# недоступны. Одним блоком с PredictionSource их бы потеряли заодно.
+try {
+    Set-PSReadLineKeyHandler -Key Tab       -Function MenuComplete           -ErrorAction Stop
+    Set-PSReadLineKeyHandler -Key UpArrow   -Function HistorySearchBackward  -ErrorAction Stop
+    Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward   -ErrorAction Stop
+} catch {
+    # Старый PSReadLine (<2.1) — оставляем клавиши по умолчанию.
 }
 
 # Default PowerShell prompt is only "PS C:\path>" — no git branch/status.
