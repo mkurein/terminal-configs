@@ -17,7 +17,7 @@
 - ✅ **WezTerm** (Windows) - современный терминал с GPU, Kitty graphics и inline-изображениями
 - ✅ **Zellij** (WSL) - terminal multiplexer с персистентностью
 - ✅ **LazyVim** (WSL) - готовая сборка Neovim с плагинами
-- ✅ **PowerShell aliases** - алиасы для PowerShell (gs, gq, gb и др.)
+- ✅ **PowerShell aliases** - алиасы для PowerShell (gs, gq, gb, gbr/gsw для веток и др.)
 - ✅ **Workspace layouts** - готовые конфигурации (40/60 и 50/50)
 - ✅ **Автозапуск** - Zellij запускается автоматически
 - ✅ **Интерактивное меню** - выбор layout при запуске
@@ -169,7 +169,61 @@ wsl --set-default Debian
 | `wezterm/wezterm.lua` | `%USERPROFILE%\.config\wezterm\` | Конфигурация WezTerm |
 | `wa.bat` | `C:\Windows\System32\` (опционально) | Команда запуска Alacritty |
 | `ww.bat` | `C:\Windows\System32\` (опционально) | Команда запуска WezTerm |
-| `powershell/Microsoft.PowerShell_profile.ps1` | `$PROFILE` | Профиль PowerShell с алиасами |
+| `powershell/Microsoft.PowerShell_profile.ps1` | `$PROFILE` | Профиль PowerShell с алиасами (gs, gbr/gsw, github-*) |
+
+---
+
+## Работа с ветками (PowerShell)
+
+Если разработка идёт в отдельной ветке или в worktree агента, легко забыть,
+где вы сейчас. Текущая ветка всегда видна в prompt, а подробности даёт `gbr`.
+Команды определены в `powershell/Microsoft.PowerShell_profile.ps1`; те же самые
+есть на macOS в `macos/zsh/aliases.zsh`.
+
+```powershell
+gbr             # обзор: текущая ветка, число локальных/удалённых,
+                #   +впереди/-позади относительно main, upstream,
+                #   в какой папке (worktree) ветка открыта
+gsw             # переключиться: список с номерами, выбрать номер
+gsw feature-x   # переключиться на ветку
+gsw -           # вернуться в предыдущую ветку
+gnb feature-x   # создать ветку от текущей и перейти в неё
+gmain           # вернуться в main/master и сделать pull --ff-only
+gcmp [ветка]    # что есть в ветке сверх main: коммиты и файлы
+gbd feature-x   # удалить ветку, только если она влита (git branch -d)
+gclean          # удалить все влитые в main ветки (спросит подтверждение)
+gwt             # список worktree: какая ветка в какой папке
+```
+
+Пример `gbr`:
+
+```text
+Сейчас: main   (локальных: 3, удалённых: 2, основная: main)
+
+  claude/agent  +1 / -0 к main    2 hours ago   без upstream | открыта в C:\Project\repo-wt
+  feature-x     +2 / -0 к main    3 days ago    origin/feature-x ahead 1
+* main                            3 days ago    origin/main
+```
+
+Ветку, открытую в другом worktree, `gsw` не переключит (так устроен git). Чтобы
+посмотреть её код, нужно перейти в папку, которую показывает `gbr`. `gclean`
+такие ветки не трогает.
+
+**Встроенные алиасы PowerShell.** `gl`, `gc` и `gp` в PowerShell по умолчанию —
+это `Get-Location`, `Get-Content` и `Get-ItemProperty`. Алиас сильнее функции,
+поэтому профиль их удаляет, и git-версии (pull, commit, push) работают.
+Проверка: `(Get-Command gbr).CommandType` должна показать `Function`.
+
+Поставить или обновить профиль (из клона `terminal-configs`):
+
+```powershell
+cd C:\Project\terminal-configs
+git pull --ff-only
+.\windows\powershell\install.ps1
+. $PROFILE
+```
+
+Подробности — [powershell/README.md](./powershell/README.md#ветки).
 
 ---
 
@@ -233,6 +287,7 @@ wsl --set-default Debian
   Алиасы для PowerShell:
   - Установка и настройка профиля
   - Git команды (gs, ga, gc, gp, gb, gq)
+  - Работа с ветками (gbr, gsw, gnb, gmain, gcmp, gclean, gwt)
   - Навигация и файловые операции
   - Windows интеграция
   - Полный список команд
