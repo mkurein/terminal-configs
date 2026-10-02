@@ -206,7 +206,7 @@ alias here='open -na Alacritty --args --working-directory "$(pwd)"'
 - `clean` - очистка системы (Homebrew, npm, Docker, кеши)
 
 **Расширенные алиасы:**
-- Git: `gs`, `ga`, `gc`, `gp`, `gl`, `gd`
+- Git: `gs`, `ga` (добавить все изменения в текущей папке), `gau` (добавить изменения и удаления отслеживаемых файлов), `gc`, `gp`, `gl`, `gd`
 - Навигация: `c`, `..`, `...`, `....`
 - Python: `py`, `pip`, `venv`, `activate`
 - macOS: `showfiles`, `hidefiles`, `flushdns`

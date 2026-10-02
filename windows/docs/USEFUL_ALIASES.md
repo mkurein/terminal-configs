@@ -80,6 +80,7 @@ g                    # git
 gs                   # git status
 ga                   # git add
 ga .                 # git add . (добавить все)
+gau                  # git add -u (изменения и удаления отслеживаемых файлов)
 gc                   # git commit -m
 gp                   # git push
 gl                   # git pull

@@ -25,6 +25,7 @@ foreach ($__builtin in 'gl', 'gc', 'gp') {
 }
 function gs { git status }
 function ga { git add . }
+function gau { git add -u }
 function gc { param([string]$message) git commit -m $message }
 function gp { git push }
 function gl { git pull }

@@ -179,6 +179,7 @@ c               # clear
 g               # git
 gs              # git status
 ga              # git add .
+gau             # git add -u (изменения и удаления отслеживаемых файлов)
 gc "message"    # git commit -m "message"
 gp              # git push
 gl              # git log (красивый)
