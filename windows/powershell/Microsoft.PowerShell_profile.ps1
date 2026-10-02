@@ -885,5 +885,5 @@ $__localProfile = Join-Path (Split-Path -Parent $PROFILE) 'profile.local.ps1'
 if (Test-Path $__localProfile) { . $__localProfile }
 
 Write-Host "✅ PowerShell aliases loaded!" -ForegroundColor Green
-Write-Host "💡 Tip: github-fetch / github-pull / github-commit / github-push / github-gh  |  github-help  |  gq-help  |  gbr (ветки)  |  mesh-st  |  exit-ip" -ForegroundColor Cyan
+Write-Host "💡 Tip: gau (git add -u)  |  github-fetch / github-pull / github-commit / github-push / github-gh  |  github-help  |  gq-help  |  gbr (ветки)  |  mesh-st  |  exit-ip" -ForegroundColor Cyan
 
