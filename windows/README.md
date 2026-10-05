@@ -169,7 +169,7 @@ wsl --set-default Debian
 | `wezterm/wezterm.lua` | `%USERPROFILE%\.config\wezterm\` | Конфигурация WezTerm |
 | `wa.bat` | `C:\Windows\System32\` (опционально) | Команда запуска Alacritty |
 | `ww.bat` | `C:\Windows\System32\` (опционально) | Команда запуска WezTerm |
-| `powershell/Microsoft.PowerShell_profile.ps1` | `$PROFILE` | Профиль PowerShell с алиасами (gs, gbr/gsw, github-*) |
+| `powershell/Microsoft.PowerShell_profile.ps1` | `$PROFILE` | Профиль PowerShell с алиасами (gs, gbr/gsw, github-*, git-eol) |
 
 ---
 
@@ -224,6 +224,87 @@ git pull --ff-only
 ```
 
 Подробности — [powershell/README.md](./powershell/README.md#ветки).
+
+---
+
+## Окончания строк: `git-eol` (PowerShell и WSL)
+
+На Windows репо легко получают CRLF: редакторы, `core.autocrlf=true` в
+системном gitconfig Git for Windows, копирование из проводника. Признаки —
+`git add` пишет `CRLF will be replaced by LF`, а `git diff` подсвечивает
+файл целиком. `git-eol` один раз приводит репо к общему правилу: в Git всё
+хранится с LF, `*.ps1`/`*.bat`/`*.cmd`/`*.reg`/`*.iss` в рабочей копии остаются
+с CRLF, бинарники не трогаются. Результат одинаковый на Windows, macOS и в CI.
+
+Команда одна и та же в PowerShell (`git-eol.ps1`, работает в Windows
+PowerShell 5.1 и PowerShell 7.x) и в WSL zsh (`git-eol.sh`). Запускать в
+текущем репо, из любой его подпапки:
+
+```powershell
+git-eol --check            # только показать проблемы, ничего не менять
+git-eol                    # исправить: .gitattributes + renormalize, без коммита
+git-eol --commit           # исправить и закоммитить
+git-eol --scan             # проверить все репо в C:\Project (глубина 3)
+git-eol --scan D:\src      # то же для другой папки
+```
+
+В PowerShell ключи можно писать и как `-Commit`, `-Check`, `-Scan`.
+
+**Старый проект:**
+
+```powershell
+cd C:\Project\my-repo
+git status                 # дерево должно быть чистым, иначе git-eol откажется
+git-eol --check
+git-eol --commit
+github-push
+```
+
+**Новый проект** — сразу после `git init`:
+
+```powershell
+git init
+git-eol --commit
+```
+
+Пример `--scan`:
+
+```text
+Сканирую C:\Project (глубина 3)…
+homelab-book                                                 OK
+ProjectPython\VPNserverManage                                FIX   блок:нет  индекс:0  рабочая-копия:0
+old-tool                                                     FIX   блок:нет  индекс:12  рабочая-копия:40
+```
+
+- `блок:нет` — в `.gitattributes` нет правил git-eol;
+- `индекс:N` — файлы, закоммиченные с CRLF; исправление создаст коммит;
+- `рабочая-копия:N` — только локальный шум на диске, в историю не попадает.
+
+Правила лежат в `.gitattributes` между `# >>> git-eol >>>` и `# <<< git-eol <<<`.
+Свои правила проекта пишите **ниже** блока: повторный `git-eol` обновит только
+блок, остальное не тронет.
+
+«The term 'git-eol' is not recognized» — сессия со старым профилем:
+
+```powershell
+cd C:\Project\terminal-configs\windows\powershell
+.\install.ps1
+. $PROFILE
+```
+
+Без профиля:
+
+```powershell
+& C:\Project\terminal-configs\git-eol\git-eol.ps1 --check
+```
+
+В WSL: `source ~/.zshrc`; без алиаса —
+`bash /mnt/c/Project/terminal-configs/git-eol/git-eol.sh --check`.
+
+Если меняете `git-eol.ps1` в редакторе, сохраняйте его в **UTF-8 с BOM**: без
+BOM Windows PowerShell 5.1 ломает кириллицу в скрипте.
+
+Подробности — [git-eol/README.md](../git-eol/README.md).
 
 ---
 

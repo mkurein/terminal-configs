@@ -71,7 +71,7 @@ cd ~/Project/terminal-configs/macos
 | `scripts/start-vpn-manage-5050.sh` | `~/start-vpn-manage-5050.sh` | Прямой запуск 50/50 |
 | `scripts/open-alacritty-here.sh` | `~/open-alacritty-here.sh` | Открыть Alacritty в папке |
 | `scripts/open-alacritty-here-simple.sh` | `~/open-alacritty-here-simple.sh` | Упрощенная версия |
-| `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Алиасы (n=nvim, gs, gbr/gsw, github-*) |
+| `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Алиасы (n=nvim, gs, gbr/gsw, github-*, git-eol) |
 | `zsh/git-prompt.zsh` | `~/.config/zsh/git-prompt.zsh` | Git в prompt: `[main S: M: ?:]` как на Windows |
 
 ## Git в prompt (как на Windows)
@@ -140,6 +140,60 @@ gwt             # список worktree: какая ветка в какой п�
 файлов), а здесь он удаляет влитые ветки.
 
 Краткая таблица всех алиасов — [ALIASES_MACBOOK_CHEATSHEET_RU.md](../ALIASES_MACBOOK_CHEATSHEET_RU.md).
+
+## Окончания строк: `git-eol`
+
+Репо, которые редактировались и на Windows, и на Mac, часто содержат файлы с
+CRLF. Из-за этого `git diff` показывает изменения во всех строках, а `git add`
+пишет `CRLF will be replaced by LF`. `git-eol` один раз приводит репо к общему
+правилу: в Git всё хранится с LF, `*.ps1`/`*.bat`/`*.iss` в рабочей копии
+остаются с CRLF, бинарники не трогаются.
+
+Команда работает в текущем репо из любой его подпапки:
+
+```bash
+git-eol --check       # только показать проблемы, ничего не менять
+git-eol               # исправить: .gitattributes + renormalize, без коммита
+git-eol --commit      # исправить и закоммитить
+git-eol --scan        # проверить все репо в ~/Project (глубина 3)
+git-eol --scan ~/src  # то же для другой папки
+```
+
+**Старый проект:**
+
+```bash
+cd ~/Project/my-repo
+git status            # дерево должно быть чистым, иначе git-eol откажется
+git-eol --check
+git-eol --commit
+github-push
+```
+
+**Новый проект** — сразу после `git init`:
+
+```bash
+git init
+git-eol --commit
+```
+
+Пример `--scan`:
+
+```text
+Сканирую /Users/me/Project (глубина 3)…
+homelab-book                                                 OK
+old-tool                                                     FIX   блок:нет  индекс:12  рабочая-копия:40
+```
+
+`индекс:N` — файлы, закоммиченные с CRLF; исправление создаст коммит.
+`рабочая-копия:N` — только локальный шум на диске, в историю не попадает.
+
+Правила лежат в `.gitattributes` между `# >>> git-eol >>>` и `# <<< git-eol <<<`.
+Свои правила проекта пишите **ниже** блока: повторный `git-eol` обновит только
+блок. Если `git-eol: command not found` — `source ~/.zshrc` или переустановка
+(`cd ~/Project/terminal-configs/macos && ./install.sh`). Без алиаса:
+`bash ~/Project/terminal-configs/git-eol/git-eol.sh --check`.
+
+Подробности — [git-eol/README.md](../git-eol/README.md).
 
 ## 🚀 Открыть Alacritty в текущей папке
 

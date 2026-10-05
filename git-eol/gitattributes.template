@@ -1,0 +1,47 @@
+# >>> git-eol >>>
+# Managed by git-eol (terminal-configs/git-eol). Re-run git-eol to refresh.
+# Project-specific rules go BELOW this block: later lines win.
+* text=auto eol=lf
+
+# Windows-only tooling keeps CRLF in the working tree
+*.bat      text eol=crlf
+*.cmd      text eol=crlf
+*.ps1      text eol=crlf
+*.psm1     text eol=crlf
+*.psd1     text eol=crlf
+*.reg      text eol=crlf
+*.iss      text eol=crlf
+*.sln      text eol=crlf
+*.vcxproj  text eol=crlf
+
+# Binary: never touch
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.gif      binary
+*.webp     binary
+*.ico      binary
+*.icns     binary
+*.pdf      binary
+*.woff     binary
+*.woff2    binary
+*.ttf      binary
+*.otf      binary
+*.zip      binary
+*.gz       binary
+*.tgz      binary
+*.7z       binary
+*.tar      binary
+*.exe      binary
+*.dll      binary
+*.so       binary
+*.dylib    binary
+*.dmg      binary
+*.pkg      binary
+*.mo       binary
+*.pyc      binary
+*.db       binary
+*.sqlite   binary
+*.sqlite3  binary
+*.enc      binary
+# <<< git-eol <<<

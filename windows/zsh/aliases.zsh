@@ -185,6 +185,25 @@ done
 [ -n "$_github_proxy_env" ] && . "$_github_proxy_env"
 unset _f _github_proxy_env
 
+# ===== GIT LINE ENDINGS (shared template: terminal-configs/git-eol) =====
+# git-eol / git-eol --check / git-eol --commit / git-eol --scan. Override: export GIT_EOL_HOME=...
+for _f in \
+  "${GIT_EOL_HOME:+$GIT_EOL_HOME/git-eol.sh}" \
+  "/mnt/c/Project/terminal-configs/git-eol/git-eol.sh" \
+  "$HOME/Project/terminal-configs/git-eol/git-eol.sh" \
+  "$HOME/terminal-configs/git-eol/git-eol.sh"
+do
+  [ -n "$_f" ] && [ -f "$_f" ] && GIT_EOL_SCRIPT="$_f" && break
+done
+unset _f
+git-eol() {
+  if [ -z "${GIT_EOL_SCRIPT:-}" ]; then
+    echo "git-eol not found. Clone terminal-configs or set GIT_EOL_HOME." >&2
+    return 1
+  fi
+  bash "$GIT_EOL_SCRIPT" "$@"
+}
+
 # ===== CUSTOM SCRIPTS =====
 alias ps='~/project-switcher.sh'
 alias gq='~/git-quick.sh'

@@ -459,6 +459,22 @@ EOF
 
 ---
 
+## Окончания строк: `git-eol`
+
+Одинаковые LF/CRLF во всех репо на Windows и macOS: блок правил в `.gitattributes`, renormalize индекса, освежение рабочей копии. Убирает шум `CRLF will be replaced by LF`.
+
+```bash
+git-eol --scan        # какие проекты в ~/Project (C:\Project) не в порядке
+cd <repo>
+git-eol --check       # только проверить
+git-eol --commit      # исправить и закоммитить
+github-push
+```
+
+Новый проект: `git init` → `git-eol --commit`. Подробности: [`git-eol/README.md`](./git-eol/README.md).
+
+---
+
 ## Содержание
 
 

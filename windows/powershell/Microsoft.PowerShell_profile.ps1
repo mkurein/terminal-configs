@@ -739,6 +739,32 @@ try {
     # PS без CommandNotFoundAction — достаточно github-help и . $PROFILE
 }
 
+# ===== GIT LINE ENDINGS (shared template: terminal-configs/git-eol) =====
+# git-eol / git-eol --check / git-eol --commit / git-eol --scan. См. git-eol/README.md.
+function Get-GitEolHome {
+    if ($env:GIT_EOL_HOME -and (Test-Path (Join-Path $env:GIT_EOL_HOME "git-eol.ps1"))) {
+        return $env:GIT_EOL_HOME
+    }
+    $candidates = @(
+        "C:\Project\terminal-configs\git-eol",
+        (Join-Path $HOME "Project\terminal-configs\git-eol"),
+        (Join-Path $HOME "terminal-configs\git-eol")
+    )
+    foreach ($c in $candidates) {
+        if (Test-Path (Join-Path $c "git-eol.ps1")) { return $c }
+    }
+    return $null
+}
+
+function git-eol {
+    $root = Get-GitEolHome
+    if (-not $root) {
+        Write-Host "git-eol not found. Clone terminal-configs or set GIT_EOL_HOME." -ForegroundColor Red
+        return
+    }
+    & (Join-Path $root "git-eol.ps1") @args
+}
+
 # ===== GIT QUICK COMMANDS HELP =====
 function Show-GqHelp {
     gq menu
@@ -885,5 +911,5 @@ $__localProfile = Join-Path (Split-Path -Parent $PROFILE) 'profile.local.ps1'
 if (Test-Path $__localProfile) { . $__localProfile }
 
 Write-Host "✅ PowerShell aliases loaded!" -ForegroundColor Green
-Write-Host "💡 Tip: gau (git add -u)  |  github-fetch / github-pull / github-commit / github-push / github-gh  |  github-help  |  gq-help  |  gbr (ветки)  |  mesh-st  |  exit-ip" -ForegroundColor Cyan
+Write-Host "💡 Tip: gau (git add -u)  |  github-fetch / github-pull / github-commit / github-push / github-gh  |  github-help  |  git-eol  |  gq-help  |  gbr (ветки)  |  mesh-st  |  exit-ip" -ForegroundColor Cyan
 
