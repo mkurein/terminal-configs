@@ -1,5 +1,7 @@
 # 🪟 Windows + WSL Terminal Configuration
 
+Cursor открывает много окон? [Одно окно и запуск сразу в IDE](../cursor/README.md) — проверенное исправление macOS и перенос настроек на другие ПК.
+
 > **Статус**: Готово ✅ | Конфигурационные файлы ✅ | Документация ✅ | Автоустановка ✅
 
 Конфигурация терминала для **Windows 11 + WSL Ubuntu** с **Alacritty / WezTerm + Zellij + LazyVim**.

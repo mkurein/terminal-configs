@@ -1,0 +1,7 @@
+{
+    "window.restoreWindows": "none",
+    "window.openFoldersInNewWindow": "off",
+    "window.openFilesInNewWindow": "off",
+    "workbench.startupEditor": "none",
+    "files.hotExit": "onExitAndWindowClose"
+}

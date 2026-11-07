@@ -1,5 +1,7 @@
 # 🍎 macOS Terminal Configuration
 
+Cursor открывает много окон? [Одно окно и запуск сразу в IDE](../cursor/README.md) — проверенное исправление macOS и перенос настроек на другие ПК.
+
 Конфигурация терминала для macOS с **Alacritty + Zellij + Neovim**.
 
 ## 📦 Что включено

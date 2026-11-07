@@ -1,5 +1,7 @@
 # 🖥️ Terminal Configurations
 
+Cursor открывает много окон? [Одно окно и запуск сразу в IDE](cursor/README.md) — проверенное исправление macOS и перенос настроек на другие ПК.
+
 Кроссплатформенный репозиторий конфигураций для терминала с **Alacritty / WezTerm + Zellij + Neovim**.
 
 Публичный канон на GitHub: [mkurein/terminal-configs](https://github.com/mkurein/terminal-configs).  
