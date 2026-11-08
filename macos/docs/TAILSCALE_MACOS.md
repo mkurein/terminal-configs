@@ -7,7 +7,12 @@
 а состояние backend было `Running` без ошибок Health.
 Перезапуск графического приложения восстановил корректное отображение;
 после перезапуска работа VPN была проверена, исправление окна подтверждено пользователем.
-Это обходное решение, а не гарантия устранения причины навсегда.
+После перезагрузки проблема повторилась: VPN подключился автоматически, но окно
+снова показывало отключение. Добавлен однократный перезапуск интерфейса через
+пользовательский LaunchAgent. При первом запуске агент завершился с кодом `0`,
+VPN остался `Connected` / `Running` без ошибок Health; пользователь подтвердил,
+что окно исправилось. Повторная перезагрузка **после установки агента пока не проверена**.
+Это обходное решение, а не исправление причины ошибки в Tailscale.
 
 Все адреса и имена ниже — примеры. Вывод реального устройства и скриншоты не включены.
 
@@ -83,12 +88,90 @@ defaults read io.tailscale.ipn.macsys TailscaleStartOnLogin
 
 Значение `1` означает включённую настройку. Оно само по себе не доказывает успешный
 запуск после перезагрузки: проверьте подключение после следующего входа в macOS.
-В описанном случае автозапуск и VPN On Demand уже были включены; перезагрузка не проверялась.
+В описанном случае автозапуск и VPN On Demand уже были включены; после перезагрузки
+подключение подтвердилось, но статус GUI вновь оказался неверным.
 
 Запуск **после входа пользователя** и **до входа пользователя** различаются.
 GUI-версии запускаются в пользовательской сессии. Для работы до входа требуется
 отдельная настройка системной службы `tailscaled`; не устанавливайте второй клиент
 параллельно без плана перехода.
+
+## Обход повторения ошибки при входе в macOS
+
+Для standalone-версии используется [tailscale-gui-refresh.zsh](../scripts/tailscale-gui-refresh.zsh).
+Скрипт ждёт 30 секунд, затем до 60 раз с интервалом 2 секунды проверяет,
+что macOS показывает подключённый VPN Tailscale. Если приложение запущено,
+один раз завершает его процесс и открывает снова в фоне. Он не меняет сервер,
+авторизацию, выходной узел и VPN On Demand. Постоянного наблюдения и циклического
+перезапуска нет: агент запускается один раз при входе, а также при первоначальной загрузке.
+Если VPN не подключился за время ожидания или приложение закрыто, скрипт ничего не делает.
+Сам скрипт не определяет, ошибочен ли статус окна: после каждого входа он обновляет
+запущенный GUI при выполнении условий выше. Возможен кратковременный перерыв связи.
+
+### Установка
+
+Выполните из корня клона `terminal-configs`; для установки нужен Python 3.
+Существующие файлы с этими именами не перезаписываются. Общий `macos/install.sh`
+не устанавливает этот обход автоматически.
+
+```bash
+python3 - <<'PYINSTALL'
+from pathlib import Path
+import plistlib
+import shutil
+
+home = Path.home()
+source = Path('macos/scripts/tailscale-gui-refresh.zsh')
+script = home / 'Library/Application Support/TailscaleGUIRefresh/refresh.zsh'
+agent = home / 'Library/LaunchAgents/local.tailscale.gui-refresh.plist'
+if not source.is_file():
+    raise SystemExit('Run from the terminal-configs repository root')
+if script.exists() or agent.exists():
+    raise SystemExit('Existing workaround found; inspect it before replacing')
+script.parent.mkdir(parents=True, exist_ok=True)
+agent.parent.mkdir(parents=True, exist_ok=True)
+shutil.copyfile(source, script)
+script.chmod(0o700)
+agent.write_bytes(plistlib.dumps({
+    'Label': 'local.tailscale.gui-refresh',
+    'ProgramArguments': ['/bin/zsh', str(script)],
+    'RunAtLoad': True,
+    'ProcessType': 'Background',
+}))
+PYINSTALL
+```
+
+Если установка завершилась успешно, проверьте файлы и загрузите агент:
+
+```bash
+/bin/zsh -n "$HOME/Library/Application Support/TailscaleGUIRefresh/refresh.zsh"
+plutil -lint "$HOME/Library/LaunchAgents/local.tailscale.gui-refresh.plist"
+launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/local.tailscale.gui-refresh.plist"
+```
+
+Через 30 секунд или после готовности VPN проверьте:
+
+```bash
+launchctl print "gui/$(id -u)/local.tailscale.gui-refresh"
+scutil --nc list
+tailscale status --json
+```
+
+`runs = 1`, `last exit code = 0` и `state = not running` нормальны для завершённого
+одноразового агента. Код `0` сам по себе не доказывает перезапуск: скрипт также
+завершается успешно, если условия не выполнены. Проверьте окно и состояние VPN.
+Повторите проверку после следующей перезагрузки и входа в учётную запись.
+
+### Удаление обходного решения
+
+```bash
+launchctl bootout "gui/$(id -u)/local.tailscale.gui-refresh"
+rm "$HOME/Library/LaunchAgents/local.tailscale.gui-refresh.plist"
+rm "$HOME/Library/Application Support/TailscaleGUIRefresh/refresh.zsh"
+rmdir "$HOME/Library/Application Support/TailscaleGUIRefresh"
+```
+
+Удаление затрагивает только этот агент и скрипт. Штатные настройки Tailscale сохраняются.
 
 ## Источники
 
