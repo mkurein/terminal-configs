@@ -1,6 +1,6 @@
 # 🪟 Windows + WSL Terminal Configuration
 
-Cursor открывает много окон? [Одно окно и запуск сразу в IDE](../cursor/README.md). Сначала полностью закройте Cursor. Дальше — двойной щелчок по `cursor\fix-startup-windows.bat` или, в отдельном PowerShell, `python cursor/fix-startup-windows.py`. В этом профиле `py` — алиас `python.exe`, поэтому `py -3` здесь не вызывайте.
+Cursor открывает много окон? [Одно окно и запуск сразу в IDE](../cursor/README.md). Сначала полностью закройте Cursor. Дальше — двойной щелчок по `cursor\fix-startup-windows.bat` или, в отдельном PowerShell, `python cursor/fix-startup-windows.py`. В этом профиле `py` — алиас `python.exe`, поэтому `py -3` здесь не вызывайте. Не открывайте Cursor, пока скрипт не закончит: при большом `state.vscdb` (на проверенном ПК 4,4 ГБ) копия занимает около минуты, и ранний запуск возвращает старые окна.
 
 > **Статус**: Готово ✅ | Конфигурационные файлы ✅ | Документация ✅ | Автоустановка ✅
 
