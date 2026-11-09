@@ -182,7 +182,7 @@ pwgen 20            # Сгенерировать пароль (20 символо
 ### Python
 
 ```powershell
-py                  # python
+py                  # алиас python.exe; ключ -3 не принимает (это не C:\Windows\py.exe)
 pip                 # pip
 venv                # Создать виртуальное окружение
 activate            # Активировать виртуальное окружение

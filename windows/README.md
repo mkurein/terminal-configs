@@ -1,6 +1,6 @@
 # 🪟 Windows + WSL Terminal Configuration
 
-Cursor открывает много окон? [Одно окно и запуск сразу в IDE](../cursor/README.md) — готовый BAT для двойного щелчка и Python-скрипт с диагностикой и резервной копией.
+Cursor открывает много окон? [Одно окно и запуск сразу в IDE](../cursor/README.md). Сначала полностью закройте Cursor. Дальше — двойной щелчок по `cursor\fix-startup-windows.bat` или, в отдельном PowerShell, `python cursor/fix-startup-windows.py`. В этом профиле `py` — алиас `python.exe`, поэтому `py -3` здесь не вызывайте.
 
 > **Статус**: Готово ✅ | Конфигурационные файлы ✅ | Документация ✅ | Автоустановка ✅
 

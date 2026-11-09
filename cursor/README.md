@@ -96,9 +96,24 @@ python3 cursor/fix-startup-macos.py --apply --archive-workspaces
 Используйте [`fix-startup-windows.py`](fix-startup-windows.py) в **Windows
 PowerShell или Terminal, не в WSL**. Требуется Python 3 с модулем SQLite
 (входит в обычную установку Python). Запускайте от своего пользователя,
-права администратора не нужны. Сохраните работу, закройте все окна Cursor
-и завершите его процессы. Скрипт проверяет `Cursor.exe` через `tasklist.exe`;
-сам ничего не завершает, при ошибке проверки процессы не считаются закрытыми.
+права администратора не нужны.
+
+Порядок такой:
+
+1. Сохраните работу.
+2. Полностью завершите Cursor: все окна, не одно. Скрипт проверяет `Cursor.exe`
+   через `tasklist.exe`, сам процессы не завершает и **откажется**, пока хотя бы
+   один процесс жив. Ошибка проверки тоже считается «Cursor ещё запущен».
+3. Запускайте исправление **снаружи Cursor**: двойной щелчок по BAT или
+   Windows Terminal / PowerShell, открытые с рабочего стола. Встроенный терминал
+   Cursor не подходит: пока он открыт, `Cursor.exe` есть, а после выхода из
+   Cursor этот терминал закрывается вместе с ним и команда не доходит до конца.
+
+В PowerShell с профилем из `windows/powershell/` команда `py` — это алиас
+`python.exe` (`Set-Alias -Name py -Value python`). У `python.exe` нет ключа
+`-3`, поэтому `py -3 …` заканчивается `Unknown option: -3`. В PowerShell
+вызывайте `python` без `-3`. Лаунчер `C:\Windows\py.exe -3` работает в **cmd**
+(двойной щелчок по BAT, `cmd /c`), где алиас PowerShell не действует.
 
 ### Двойным щелчком
 
@@ -106,8 +121,10 @@ PowerShell или Terminal, не в WSL**. Требуется Python 3 с мод
 и дважды щёлкните **[`fix-startup-windows.bat`](fix-startup-windows.bat)**.
 Сначала сохраните работу и полностью закройте Cursor.
 
-BAT автоматически ищет Python 3: сначала `py -3`, затем `python`; проверяет
-наличие SQLite и запускает **полное исправление** с `--apply --archive-workspaces`.
+BAT запускается через cmd, не через PowerShell, поэтому его `py -3` — это
+`C:\Windows\py.exe`, а не алиас профиля. Дальше он ищет Python 3: сначала
+`py -3`, затем `python`; проверяет наличие SQLite и запускает **полное
+исправление** с `--apply --archive-workspaces`.
 Перед изменениями Python-скрипт создаёт резервную копию. Старые временные
 рабочие пространства будут перенесены туда и перестанут открываться автоматически.
 Окно остаётся открытым как после успеха, так и после ошибки, чтобы прочитать
@@ -122,22 +139,27 @@ BAT автоматически ищет Python 3: сначала `py -3`, зат
 
 ### Из терминала
 
+Только после полного выхода из Cursor, в отдельном окне PowerShell:
+
 ```powershell
 cd C:\Project\terminal-configs
 git pull --ff-only
+python --version
 
 # Диагностика без изменений
-py -3 cursor/fix-startup-windows.py
+python cursor/fix-startup-windows.py
 
 # Настройки IDE без переноса временной сессии
-py -3 cursor/fix-startup-windows.py --apply
+python cursor/fix-startup-windows.py --apply
 
 # Полное исправление массового открытия окон
-py -3 cursor/fix-startup-windows.py --apply --archive-workspaces
+python cursor/fix-startup-windows.py --apply --archive-workspaces
 ```
 
-Если команда `py` отсутствует, используйте `python` после проверки
-`python --version` (нужен Python 3). Скрипт берёт данные из `%APPDATA%\Cursor`.
+`python --version` должен показать Python 3. Не подставляйте `py -3` в этот
+PowerShell: профиль репозитория перехватывает `py`. Если PowerShell без этого
+профиля и `Get-Command py` показывает `C:\Windows\py.exe`, тогда подходит
+`py -3 cursor/fix-startup-windows.py`. Скрипт берёт данные из `%APPDATA%\Cursor`.
 Portable-установки и нестандартный `--user-data-dir` этим скриптом не обслуживаются.
 Не копируйте один файл отдельно: рядом нужны `cursor_startup.py` и `settings.json`.
 Те же соседние файлы нужны и macOS-скрипту; используйте целую папку `cursor`.
@@ -155,14 +177,17 @@ Portable-установки и нестандартный `--user-data-dir` эт
 
 **Статус проверки:** общая логика изменения настроек и резервирования,
 проверка процессов Windows, отказ при работающем Cursor и ошибки входных
-данных проверены автоматическими тестами на временных файлах. BAT проверен статически; выполнение двойным щелчком и запуск GUI
-Cursor на настоящем Windows в этой сессии не проверялись; ключи режима IDE
-основаны на изученной версии 3.29.9 для macOS.
+данных проверены автоматическими тестами на временных файлах. На Windows 11
+(2026-11-09) диагностика `python cursor/fix-startup-windows.py` из PowerShell
+с этим профилем отработала: `py -3` дал `Unknown option: -3`, потому что `py`
+был алиасом `python.exe`. Пока Cursor был открыт, применение настроек скрипт
+не выполнял. Двойной щелчок BAT и вид одного окна IDE после полного выхода
+этим запуском не подтверждались; ключи режима IDE основаны на версии 3.29.9.
 
 Проверить скрипты из корня репозитория (реальные настройки не изменяются):
 
 ```powershell
-py -3 -m unittest discover -s cursor/tests -v
+python -m unittest discover -s cursor/tests -v
 ```
 
 ## Linux — ручной перенос решения
